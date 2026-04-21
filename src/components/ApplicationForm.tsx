@@ -33,6 +33,7 @@ const steps = [
   { id: "personal", title: "Personal Details" },
   { id: "education", title: "Education" },
   { id: "documents", title: "Documents" },
+  { id: "account", title: "Account" },
   { id: "review", title: "Review" },
 ];
 
@@ -61,6 +62,9 @@ export default function ApplicationForm() {
       isValid = await trigger(["schoolName", "course", "yearLevel", "gwa"]);
     } else if (currentStep === 2) {
       // Document upload validation would go here. Assuming valid for now.
+      isValid = true;
+    } else if (currentStep === 3) {
+      // Account validation would go here. Assuming valid for now.
       isValid = true;
     }
 
@@ -263,8 +267,36 @@ export default function ApplicationForm() {
             </p>
           </div>
 
-          {/* Step 4: Review */}
+          {/* Step 4: Account */}
           <div className={currentStep === 3 ? "block" : "hidden"}>
+            <div className="mb-8">
+              <h2 className="font-display text-3xl font-bold mb-2" style={{ color: "var(--green-deep)" }}>Account Information</h2>
+              <p className="font-body text-[var(--muted)]">Create your account to track your application status.</p>
+            </div>
+            
+            <div className="space-y-4 mb-6">
+              <div className="space-y-2">
+                <label htmlFor="username" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>Username <span className="text-red-500">*</span></label>
+                <input id="username" type="text" placeholder="Choose a username" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[var(--green-bright)]" />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="password" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>Password <span className="text-red-500">*</span></label>
+                <input id="password" type="password" placeholder="Create a password" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[var(--green-bright)]" />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="confirmPassword" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>Confirm Password <span className="text-red-500">*</span></label>
+                <input id="confirmPassword" type="password" placeholder="Confirm your password" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[var(--green-bright)]" />
+              </div>
+            </div>
+            
+            <p className="text-sm text-gray-500 flex items-start gap-2 bg-blue-50 p-4 rounded-xl text-blue-900">
+              <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+              Note: For this prototype, account creation is simulated. You can proceed without entering credentials.
+            </p>
+          </div>
+
+          {/* Step 5: Review */}
+          <div className={currentStep === 4 ? "block" : "hidden"}>
             <div className="mb-8">
               <h2 className="font-display text-3xl font-bold mb-2" style={{ color: "var(--green-deep)" }}>Review & Submit</h2>
               <p className="font-body text-[var(--muted)]">Please review your application details before submitting.</p>
