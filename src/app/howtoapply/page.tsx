@@ -30,9 +30,8 @@ const steps = [
 ];
 
 const documents = [
-  "Government-issued ID/School ID",
-  "Barangay Certificate of Parent/Guardian",
-  "BarangayCertificate of Scholar"
+  "Certificate of Residency",
+  "School ID or any Government ID"
 ];
 
 export default function ApplyPage() {
