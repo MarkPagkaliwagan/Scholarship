@@ -27,7 +27,7 @@ export default function ApplyPage() {
           <p className="font-mono text-xs tracking-[0.3em] uppercase text-[var(--green-light)] mb-3">
             Academic Year 2026
           </p>
-          <h1 className="font-display text-4xl md:text-5xl font-bold text-white mb-4">
+          <h1 className="h1 font-display text-4xl md:text-5xl font-bold text-white mb-4">
             Scholarship Application
           </h1>
           <p className="font-body text-lg text-white/80 max-w-2xl">

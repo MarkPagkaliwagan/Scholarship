@@ -49,10 +49,10 @@ export default function ApplyPage() {
             Application Guide
           </p>
           <h1
-            className="font-display text-6xl md:text-7xl font-bold leading-tight mb-6"
+            className="h1 font-display text-6xl md:text-7xl font-bold leading-tight mb-6"
             style={{ color: "var(--green-deep)" }}
           >
-            How to<br /><span className="italic">Apply</span>
+            How to Apply<br />
           </h1>
           <p
             className="font-body text-lg max-w-xl leading-relaxed"

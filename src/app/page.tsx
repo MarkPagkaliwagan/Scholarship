@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { GraduationCap, MapPin, CheckCircle, Clock, FileText, Award, CalendarDays, Bell } from "lucide-react";
+import { GraduationCap, MapPin, CheckCircle, Clock, FileText, Award, CalendarDays, Bell, Search } from "lucide-react";
 import TrackApplication from "@/components/TrackApplication";
 import FAQAccordion from "@/components/FAQAccordion";
 
@@ -15,7 +15,7 @@ const steps = [
     desc: "Fill out the online application form and upload your compiled documents before the deadline.",
   },
   {
-    icon: Search, // Wait, Search is not imported, let's fix imports
+    icon: Search,
     title: "3. Evaluation",
     desc: "The committee will review your application. You can track your status anytime.",
   },
@@ -25,8 +25,6 @@ const steps = [
     desc: "Qualified scholars will be notified for the official contract signing and distribution.",
   },
 ];
-
-import { Search } from "lucide-react"; // Imported Search
 
 export default function HomePage() {
   return (
@@ -54,10 +52,10 @@ export default function HomePage() {
             </span>
           </div>
 
-          <h1 className="font-display text-5xl md:text-7xl font-bold leading-[1.1] mb-6 tracking-tight"
+          <h1 className="h1 font-display text-5xl md:text-7xl font-bold leading-[1.1] mb-6 tracking-tight"
             style={{ color: "var(--green-deep)" }}>
             Empowering San Pablo's<br />
-            <span className="italic" style={{ color: "var(--green-bright)" }}>Future Leaders</span>
+            <span style={{ color: "var(--green-bright)" }}>Future Leaders</span>
           </h1>
 
           <p className="font-body text-lg md:text-xl max-w-2xl leading-relaxed mb-10"
@@ -91,7 +89,7 @@ export default function HomePage() {
               Deadline for submission of requirements is on <span className="font-bold text-[#F97316]">May 31, 2026</span>.
             </p>
           </div>
-          <Link href="/announcements" className="font-mono text-xs tracking-widest text-white/80 hover:text-white uppercase transition-colors whitespace-nowrap">
+          <Link href="/contacts" className="font-mono text-xs tracking-widest text-white/80 hover:text-white uppercase transition-colors whitespace-nowrap">
             View All Announcements →
           </Link>
         </div>

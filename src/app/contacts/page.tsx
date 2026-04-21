@@ -16,9 +16,9 @@ export default function ContactPage() {
         <div className="mb-20">
           <p className="font-mono text-xs tracking-[0.3em] uppercase mb-4"
             style={{ color: "var(--green-bright)" }}>Get in Touch</p>
-          <h1 className="font-display text-6xl md:text-7xl font-bold leading-tight mb-6"
+          <h1 className="h1 font-display text-6xl md:text-7xl font-bold leading-tight mb-6"
             style={{ color: "var(--green-deep)" }}>
-            Contact<br /><span className="italic">Us</span>
+            Contact Us<br />
           </h1>
           <p className="font-body text-lg max-w-lg leading-relaxed" style={{ color: "var(--muted)" }}>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Have questions about
