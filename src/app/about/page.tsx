@@ -2,7 +2,13 @@ const pillars = [
   {
     number: "01",
     title: "Our Mission",
-    body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque vehicula magna at libero tincidunt, sit amet dignissim erat efficitur. Pellentesque habitant morbi tristique senectus.",
+    body: (
+      <ul className="list-disc pl-5 space-y-1">
+        <li>Transparent and accountable governance</li>
+        <li>Sustainable environmental protection</li>
+        <li>Inclusive economic development</li>
+      </ul>
+    ),
   },
   {
     number: "02",
