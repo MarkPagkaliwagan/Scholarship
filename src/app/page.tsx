@@ -53,8 +53,8 @@ export default function Home() {
               </div>
             </div>
             <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 mb-6 tracking-tight">
-              Scholarship Management
-              <span className="block text-green-700 mt-2">Made Simple</span>
+              San Pablo Scholarship 
+              <span className="block text-green-700 mt-2">Management System</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
               Apply for scholarships, track your applications, and manage your
@@ -81,8 +81,8 @@ export default function Home() {
       {/* ── Features Section (Linked to 'About') ── */}
       {/* Added id="about" so the header link can find it */}
       {/* Added scroll-mt-24 to prevent the fixed header from overlapping the title */}
-      <section id="about" className="py-32 bg-white scroll-mt-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="about" className="py-32 bg-white scroll-mt-14">
+        <div className="max-w-7xl mx-auto px-24 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
             <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
               Everything You Need in One Platform
