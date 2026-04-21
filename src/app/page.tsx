@@ -53,7 +53,7 @@ export default function HomePage() {
           </div>
 
           <h1 className="h1 font-display text-5xl md:text-7xl font-bold leading-[1.1] mb-6 tracking-tight"
-            style={{ color: "var(--green-deep)" }}>
+            style={{color: "var(--green-deep)" }}>
             Empowering San Pablo's<br />
             <span style={{ color: "var(--green-bright)" }}>Future Leaders</span>
           </h1>

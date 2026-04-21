@@ -31,7 +31,7 @@ export default function AboutPage() {
         <div className="mb-20 border-b pb-16" style={{ borderColor: "var(--sand)" }}>
           <p className="font-mono text-xs tracking-[0.3em] uppercase mb-4"
             style={{ color: "var(--green-bright)" }}>About Us</p>
-          <h1 className="h1 font-display text-6xl md:text-7xl font-bold leading-tight mb-8"
+          <h1 className="h1 font-sanserif text-6xl md:text-7xl font-bold leading-tight mb-8"
             style={{ color: "var(--green-deep)" }}>
             Empowering Students
           </h1>
