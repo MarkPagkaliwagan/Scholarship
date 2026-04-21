@@ -4,32 +4,35 @@ const steps = [
   {
     step: "01",
     title: "Check Eligibility",
-    body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque vehicula magna at libero tincidunt, sit amet dignissim erat efficitur.",
+    body: (
+      <ul className="list-disc pl-5 space-y-1">
+        <li>Resident of San Pablo City</li>
+        <li>Currently enrolled or an incoming college student</li>
+        <li>No failing grades / meets the required grade criteria</li>
+      </ul>
+    ),
   },
   {
     step: "02",
     title: "Prepare Documents",
-    body: "Sed euismod, nisl vel ultricies lacinia, nisl nisl aliquam nisl. Pellentesque habitant morbi tristique senectus et netus malesuada.",
+    body: "Prepare all required documents such as academic records, proof of enrollment, valid ID, and other supporting requirements.",
   },
   {
     step: "03",
     title: "Submit Application",
-    body: "Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper.",
+    body: "Complete the application form and submit all required documents to the online portal.",
   },
   {
     step: "04",
     title: "Track Your Status",
-    body: "Aenean ultricies mi vitae est. Mauris placerat eleifend leo. Quisque sit amet est et sapien ullamcorper pharetra.",
+    body: "Wait for updates and announcements regarding your application status from the scholarship office.",
   },
 ];
 
 const documents = [
-  "Transcript of Records",
-  "Personal Statement / Essay",
-  "Letters of Recommendation (2)",
-  "Government-issued ID",
-  "Proof of Enrollment",
-  "Barangay Certificate",
+  "Government-issued ID/School ID",
+  "Barangay Certificate of Parent/Guardian",
+  "BarangayCertificate of Scholar"
 ];
 
 export default function ApplyPage() {
@@ -39,50 +42,99 @@ export default function ApplyPage() {
 
         {/* Header */}
         <div className="mb-20">
-          <p className="font-mono text-xs tracking-[0.3em] uppercase mb-4"
-            style={{ color: "var(--green-bright)" }}>Application Guide</p>
-          <h1 className="font-display text-6xl md:text-7xl font-bold leading-tight mb-6"
-            style={{ color: "var(--green-deep)" }}>
+          <p
+            className="font-mono text-xs tracking-[0.3em] uppercase mb-4"
+            style={{ color: "var(--green-bright)" }}
+          >
+            Application Guide
+          </p>
+          <h1
+            className="font-display text-6xl md:text-7xl font-bold leading-tight mb-6"
+            style={{ color: "var(--green-deep)" }}
+          >
             How to<br /><span className="italic">Apply</span>
           </h1>
-          <p className="font-body text-lg max-w-xl leading-relaxed" style={{ color: "var(--muted)" }}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Follow these simple
-            steps to complete your scholarship application.
+          <p
+            className="font-body text-lg max-w-xl leading-relaxed"
+            style={{ color: "var(--muted)" }}
+          >
+            Follow these simple steps to complete your scholarship application for Iskolar ng San Pablo.
           </p>
         </div>
 
         {/* Steps */}
         <div className="mb-24 space-y-0">
           {steps.map((s, i) => (
-            <div key={s.step}
+            <div
+              key={s.step}
               className="flex gap-8 pb-12 relative"
-              style={{ borderLeft: i < steps.length - 1 ? `1px solid var(--sand)` : "none", marginLeft: "20px", paddingLeft: "40px" }}>
+              style={{
+                borderLeft: i < steps.length - 1 ? `1px solid var(--sand)` : "none",
+                marginLeft: "20px",
+                paddingLeft: "40px",
+              }}
+            >
               {/* Dot */}
-              <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full border-2"
-                style={{ background: "var(--green-bright)", borderColor: "var(--green-deep)" }} />
+              <div
+                className="absolute -left-[9px] top-0 w-4 h-4 rounded-full border-2"
+                style={{
+                  background: "var(--green-bright)",
+                  borderColor: "var(--green-deep)",
+                }}
+              />
+
               <div className="flex-1">
-                <span className="font-mono text-xs tracking-widest"
-                  style={{ color: "var(--green-light)" }}>{s.step}</span>
-                <h2 className="font-display text-2xl font-semibold mt-1 mb-2"
-                  style={{ color: "var(--green-deep)" }}>{s.title}</h2>
-                <p className="font-body text-sm leading-relaxed" style={{ color: "var(--muted)" }}>{s.body}</p>
+                <span
+                  className="font-mono text-xs tracking-widest"
+                  style={{ color: "var(--green-light)" }}
+                >
+                  {s.step}
+                </span>
+
+                <h2
+                  className="font-display text-2xl font-semibold mt-1 mb-2"
+                  style={{ color: "var(--green-deep)" }}
+                >
+                  {s.title}
+                </h2>
+
+                {/* Changed from <p> to <div> to support lists */}
+                <div
+                  className="font-body text-sm leading-relaxed"
+                  style={{ color: "var(--muted)" }}
+                >
+                  {s.body}
+                </div>
               </div>
             </div>
           ))}
         </div>
 
         {/* Documents */}
-        <div className="p-10 rounded-2xl border mb-16"
-          style={{ background: "var(--parchment)", borderColor: "var(--sand)" }}>
-          <h2 className="font-display text-2xl font-bold mb-6" style={{ color: "var(--green-deep)" }}>
+        <div
+          className="p-10 rounded-2xl border mb-16"
+          style={{ background: "var(--parchment)", borderColor: "var(--sand)" }}
+        >
+          <h2
+            className="font-display text-2xl font-bold mb-6"
+            style={{ color: "var(--green-deep)" }}
+          >
             Required Documents
           </h2>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {documents.map((doc, i) => (
               <div key={i} className="flex items-center gap-3">
-                <span className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                  style={{ background: "var(--green-bright)" }} />
-                <span className="font-body text-sm" style={{ color: "var(--muted)" }}>{doc}</span>
+                <span
+                  className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                  style={{ background: "var(--green-bright)" }}
+                />
+                <span
+                  className="font-body text-sm"
+                  style={{ color: "var(--muted)" }}
+                >
+                  {doc}
+                </span>
               </div>
             ))}
           </div>
@@ -90,9 +142,11 @@ export default function ApplyPage() {
 
         {/* CTA */}
         <div className="text-center">
-          <Link href="/contact"
+          <Link
+            href="/contact"
             className="px-10 py-4 rounded-full text-sm font-medium font-body transition-all hover:opacity-90"
-            style={{ background: "var(--green-deep)", color: "var(--cream)" }}>
+            style={{ background: "var(--green-deep)", color: "var(--cream)" }}
+          >
             Contact Us for More Info →
           </Link>
         </div>
