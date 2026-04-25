@@ -242,7 +242,6 @@ export default function ApplicationForm() {
             <div className="space-y-4">
               {[
                 { label: "Certificate of Residency", desc: "Issued within the last 3 months" },
-                { label: "Certified True Copy of Grades", desc: "From the previous semester" },
                 { label: "Valid ID", desc: "School ID or any Government ID" }
               ].map((doc, idx) => (
                 <div key={idx} className="border-2 border-dashed border-gray-200 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4 bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer group">
