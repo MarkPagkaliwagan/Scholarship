@@ -4,8 +4,9 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { CheckCircle2, ChevronRight, ChevronLeft, UploadCloud, FileText, AlertCircle, Loader2 } from "lucide-react";
+import { CheckCircle2, ChevronRight, ChevronLeft, UploadCloud, FileText, AlertCircle, Loader2, User, GraduationCap, FolderOpen, UserCog, ClipboardCheck, Shield, Badge } from "lucide-react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 
 const personalSchema = z.object({
   firstName: z.string().min(2, "First name is required"),
@@ -29,12 +30,18 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
-const steps = [
-  { id: "personal", title: "Personal Details" },
-  { id: "education", title: "Education" },
-  { id: "documents", title: "Documents" },
-  { id: "account", title: "Account" },
-  { id: "review", title: "Review" },
+interface FormStep {
+  id: string;
+  title: string;
+  icon: React.ElementType;
+}
+
+const steps: FormStep[] = [
+  { id: "personal", title: "Personal", icon: User },
+  { id: "education", title: "Education", icon: GraduationCap },
+  { id: "documents", title: "Documents", icon: FolderOpen },
+  { id: "account", title: "Account", icon: UserCog },
+  { id: "review", title: "Review", icon: ClipboardCheck },
 ];
 
 export default function ApplicationForm() {
@@ -60,11 +67,7 @@ export default function ApplicationForm() {
       isValid = await trigger(["firstName", "lastName", "email", "phone", "address"]);
     } else if (currentStep === 1) {
       isValid = await trigger(["schoolName", "course", "yearLevel", "gwa"]);
-    } else if (currentStep === 2) {
-      // Document upload validation would go here. Assuming valid for now.
-      isValid = true;
-    } else if (currentStep === 3) {
-      // Account validation would go here. Assuming valid for now.
+    } else {
       isValid = true;
     }
 
@@ -81,7 +84,6 @@ export default function ApplicationForm() {
 
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
-    // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 2000));
     console.log("Form submitted:", data);
     setApplicationId(`SPC-${Math.random().toString(36).substring(2, 8).toUpperCase()}`);
@@ -92,282 +94,578 @@ export default function ApplicationForm() {
 
   if (isSuccess) {
     return (
-      <div className="w-full max-w-2xl mx-auto p-8 md:p-12 text-center bg-white rounded-3xl shadow-sm border" style={{ borderColor: "var(--sand)" }}>
-        <div className="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center animate-in zoom-in" style={{ background: "var(--green-light)", color: "var(--green-deep)" }}>
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="w-full max-w-2xl mx-auto p-8 md:p-12 text-center bg-white rounded-3xl shadow-sm border"
+        style={{ borderColor: "var(--sand)" }}
+      >
+        <div className="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center" style={{ background: "var(--green-deep)", color: "white" }}>
           <CheckCircle2 className="w-10 h-10" />
         </div>
-        <h2 className="font-display text-4xl font-bold mb-4" style={{ color: "var(--green-deep)" }}>Application Submitted!</h2>
-        <p className="font-body text-lg mb-8" style={{ color: "var(--muted)" }}>
-          Thank you for applying. We have received your application and will begin the evaluation process soon.
+        <p className="text-[10px] tracking-[0.2em] uppercase mb-3" style={{ color: "var(--green-bright)" }}>
+          Application Received
         </p>
-        <div className="p-6 rounded-2xl mb-8" style={{ background: "var(--cream)" }}>
-          <p className="font-mono text-sm uppercase tracking-widest mb-2" style={{ color: "var(--green-mid)" }}>Your Application ID</p>
-          <p className="font-mono text-3xl font-bold tracking-widest" style={{ color: "var(--green-deep)" }}>{applicationId}</p>
+        <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: "var(--green-deep)" }}>
+          Thank You!
+        </h2>
+        <p className="text-base mb-8 max-w-md mx-auto" style={{ color: "var(--muted)" }}>
+          Your application has been submitted. Our scholarship committee will review your documents and get back to you within 2-4 weeks.
+        </p>
+        <div className="inline-flex items-center gap-4 px-8 py-4 rounded-2xl mb-8" style={{ background: "var(--cream)" }}>
+          <div className="text-left">
+            <p className="text-[10px] tracking-widest uppercase mb-1" style={{ color: "var(--green-mid)" }}>Application ID</p>
+            <p className="text-2xl font-bold" style={{ color: "var(--green-deep)" }}>{applicationId}</p>
+          </div>
+          <div className="w-px h-12" style={{ background: "var(--sand)" }} />
+          <Badge className="w-8 h-8" style={{ color: "var(--green-bright)" }} />
         </div>
-        <p className="font-body text-sm mb-8" style={{ color: "var(--muted)" }}>
-          Please save this ID. You can use it to track your application status on our homepage.
-        </p>
-        <Link href="/" className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-medium font-body transition-all hover:opacity-90" style={{ background: "var(--green-deep)", color: "var(--cream)" }}>
-          Return to Homepage
-        </Link>
-      </div>
+        <div className="space-y-2 mb-8 p-6 rounded-2xl text-left" style={{ background: "var(--parchment)" }}>
+          <p className="text-sm font-medium mb-3" style={{ color: "var(--green-deep)" }}>What's Next?</p>
+          <ul className="text-sm space-y-2" style={{ color: "var(--muted)" }}>
+            <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4" style={{ color: "var(--green-bright)" }} /> Check your email for confirmation</li>
+            <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4" style={{ color: "var(--green-bright)" }} /> Track status using your Application ID</li>
+            <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4" style={{ color: "var(--green-bright)" }} /> Keep your contact information updated</li>
+          </ul>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Link href="/" className="px-8 py-3 rounded-full font-medium transition-all hover:opacity-90" style={{ background: "var(--green-deep)", color: "white" }}>
+            Return to Homepage
+          </Link>
+          <Link href="/howtoapply" className="px-8 py-3 rounded-full font-medium border-2 transition-all hover:bg-gray-50" style={{ borderColor: "var(--green-deep)", color: "var(--green-deep)" }}>
+            View Application Guide
+          </Link>
+        </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="w-full max-w-3xl mx-auto">
+    <div className="w-full max-w-4xl mx-auto">
       
-      {/* Progress Stepper */}
-      <div className="mb-12">
-        <div className="flex items-center justify-between relative">
-          <div className="absolute left-0 right-0 top-1/2 h-0.5 -translate-y-1/2 bg-gray-200 z-0" />
-          <div className="absolute left-0 top-1/2 h-0.5 -translate-y-1/2 transition-all duration-500 z-0" 
-            style={{ width: `${(currentStep / (steps.length - 1)) * 100}%`, background: "var(--green-bright)" }} />
-          
+      <div className="mb-8">
+        <div className="flex items-center justify-between gap-1 sm:gap-2">
           {steps.map((step, index) => {
             const isCompleted = index < currentStep;
             const isCurrent = index === currentStep;
+            const Icon = step.icon;
+            
             return (
-              <div key={step.id} className="relative z-10 flex flex-col items-center gap-2">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-mono text-sm transition-colors duration-300 ${
-                  isCompleted ? "bg-[var(--green-bright)] text-white" : 
-                  isCurrent ? "bg-[var(--green-deep)] text-white ring-4 ring-[var(--green-light)]" : 
-                  "bg-white border-2 border-gray-200 text-gray-400"
-                }`}>
-                  {isCompleted ? <CheckCircle2 className="w-5 h-5" /> : index + 1}
+              <button
+                key={step.id}
+                onClick={() => index < currentStep && setCurrentStep(index)}
+                disabled={index > currentStep}
+                className="flex-1 flex flex-col items-center gap-2 py-3 px-1 rounded-xl transition-all"
+                style={{
+                  background: isCurrent ? "rgba(45, 106, 79, 0.08)" : "transparent",
+                  cursor: index > currentStep ? "default" : "pointer",
+                }}
+              >
+                <div 
+                  className="w-10 h-10 rounded-full flex items-center justify-center transition-all"
+                  style={{
+                    background: isCompleted || isCurrent ? "var(--green-deep)" : "#f3f4f6",
+                    color: isCompleted || isCurrent ? "white" : "#9ca3af",
+                    boxShadow: isCurrent ? "0 0 0 4px rgba(45, 106, 79, 0.15)" : "none",
+                  }}
+                >
+                  {isCompleted ? <CheckCircle2 className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
                 </div>
-                <span className={`text-xs font-semibold uppercase tracking-wider absolute top-12 whitespace-nowrap transition-colors ${
-                  isCurrent ? "text-[var(--green-deep)]" : "text-gray-400"
-                }`}>
+                <span className="text-[10px] sm:text-xs font-medium text-center"
+                  style={{
+                    color: isCurrent ? "var(--green-deep)" : isCompleted ? "var(--green-mid)" : "#9ca3af",
+                  }}
+                >
                   {step.title}
                 </span>
-              </div>
+              </button>
             );
           })}
         </div>
+        <div className="mt-3 h-1 rounded-full overflow-hidden" style={{ background: "var(--sand)" }}>
+          <motion.div 
+            className="h-full rounded-full"
+            initial={{ width: 0 }}
+            animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+            style={{ background: "var(--green-deep)" }}
+          />
+        </div>
       </div>
 
-      {/* Form Container */}
-      <div className="bg-white rounded-3xl p-8 md:p-12 shadow-sm border mt-16" style={{ borderColor: "var(--sand)" }}>
+      <motion.div 
+        className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border"
+        style={{ borderColor: "var(--sand)" }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
         <form onSubmit={handleSubmit(onSubmit)}>
-          
-          {/* Step 1: Personal Details */}
-          <div className={currentStep === 0 ? "block" : "hidden"}>
-            <div className="mb-8">
-              <h2 className="font-display text-3xl font-bold mb-2" style={{ color: "var(--green-deep)" }}>Personal Details</h2>
-              <p className="font-body text-[var(--muted)]">Please provide your legal name and contact information.</p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div className="space-y-2">
-                <label htmlFor="firstName" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>First Name <span className="text-red-500">*</span></label>
-                <input id="firstName" {...register("firstName")} className={`w-full px-4 py-3 rounded-xl border ${errors.firstName ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:ring-[var(--green-bright)]'} focus:outline-none focus:ring-2`} />
-                {errors.firstName && <p className="text-red-500 text-xs flex items-center gap-1 mt-1"><AlertCircle className="w-3 h-3" /> {errors.firstName.message}</p>}
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="lastName" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>Last Name <span className="text-red-500">*</span></label>
-                <input id="lastName" {...register("lastName")} className={`w-full px-4 py-3 rounded-xl border ${errors.lastName ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:ring-[var(--green-bright)]'} focus:outline-none focus:ring-2`} />
-                {errors.lastName && <p className="text-red-500 text-xs flex items-center gap-1 mt-1"><AlertCircle className="w-3 h-3" /> {errors.lastName.message}</p>}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div className="space-y-2">
-                <label htmlFor="email" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>Email Address <span className="text-red-500">*</span></label>
-                <input id="email" type="email" {...register("email")} className={`w-full px-4 py-3 rounded-xl border ${errors.email ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:ring-[var(--green-bright)]'} focus:outline-none focus:ring-2`} />
-                {errors.email && <p className="text-red-500 text-xs flex items-center gap-1 mt-1"><AlertCircle className="w-3 h-3" /> {errors.email.message}</p>}
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="phone" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>Mobile Number <span className="text-red-500">*</span></label>
-                <input id="phone" type="tel" placeholder="09XX XXX XXXX" {...register("phone")} className={`w-full px-4 py-3 rounded-xl border ${errors.phone ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:ring-[var(--green-bright)]'} focus:outline-none focus:ring-2`} />
-                {errors.phone && <p className="text-red-500 text-xs flex items-center gap-1 mt-1"><AlertCircle className="w-3 h-3" /> {errors.phone.message}</p>}
-              </div>
-            </div>
-
-            <div className="space-y-2 mb-6">
-              <label htmlFor="address" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>Full Address in San Pablo City <span className="text-red-500">*</span></label>
-              <textarea id="address" rows={3} {...register("address")} className={`w-full px-4 py-3 rounded-xl border ${errors.address ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:ring-[var(--green-bright)]'} focus:outline-none focus:ring-2 resize-none`} />
-              {errors.address && <p className="text-red-500 text-xs flex items-center gap-1 mt-1"><AlertCircle className="w-3 h-3" /> {errors.address.message}</p>}
-            </div>
-          </div>
-
-          {/* Step 2: Education */}
-          <div className={currentStep === 1 ? "block" : "hidden"}>
-            <div className="mb-8">
-              <h2 className="font-display text-3xl font-bold mb-2" style={{ color: "var(--green-deep)" }}>Educational Background</h2>
-              <p className="font-body text-[var(--muted)]">Details about your current academic standing.</p>
-            </div>
-            
-            <div className="space-y-2 mb-6">
-              <label htmlFor="schoolName" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>Name of School / University <span className="text-red-500">*</span></label>
-              <input id="schoolName" {...register("schoolName")} className={`w-full px-4 py-3 rounded-xl border ${errors.schoolName ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:ring-[var(--green-bright)]'} focus:outline-none focus:ring-2`} />
-              {errors.schoolName && <p className="text-red-500 text-xs flex items-center gap-1 mt-1"><AlertCircle className="w-3 h-3" /> {errors.schoolName.message}</p>}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div className="space-y-2">
-                <label htmlFor="course" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>Course / Program <span className="text-red-500">*</span></label>
-                <input id="course" {...register("course")} className={`w-full px-4 py-3 rounded-xl border ${errors.course ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:ring-[var(--green-bright)]'} focus:outline-none focus:ring-2`} />
-                {errors.course && <p className="text-red-500 text-xs flex items-center gap-1 mt-1"><AlertCircle className="w-3 h-3" /> {errors.course.message}</p>}
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label htmlFor="yearLevel" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>Year Level <span className="text-red-500">*</span></label>
-                  <select id="yearLevel" {...register("yearLevel")} className={`w-full px-4 py-3 rounded-xl border bg-white ${errors.yearLevel ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:ring-[var(--green-bright)]'} focus:outline-none focus:ring-2 appearance-none`}>
-                    <option value="">Select...</option>
-                    <option value="1">1st Year</option>
-                    <option value="2">2nd Year</option>
-                    <option value="3">3rd Year</option>
-                    <option value="4">4th Year</option>
-                    <option value="5">5th Year</option>
-                  </select>
-                  {errors.yearLevel && <p className="text-red-500 text-xs flex items-center gap-1 mt-1"><AlertCircle className="w-3 h-3" /> {errors.yearLevel.message}</p>}
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="gwa" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>Latest GWA <span className="text-red-500">*</span></label>
-                  <input id="gwa" placeholder="e.g. 1.50 or 92" {...register("gwa")} className={`w-full px-4 py-3 rounded-xl border ${errors.gwa ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:ring-[var(--green-bright)]'} focus:outline-none focus:ring-2`} />
-                  {errors.gwa && <p className="text-red-500 text-xs flex items-center gap-1 mt-1"><AlertCircle className="w-3 h-3" /> {errors.gwa.message}</p>}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Step 3: Documents */}
-          <div className={currentStep === 2 ? "block" : "hidden"}>
-            <div className="mb-8">
-              <h2 className="font-display text-3xl font-bold mb-2" style={{ color: "var(--green-deep)" }}>Required Documents</h2>
-              <p className="font-body text-[var(--muted)]">Please upload clear copies of the following documents. (PDF, JPG, PNG)</p>
-            </div>
-            
-            <div className="space-y-4">
-              {[
-                { label: "Certificate of Residency", desc: "Issued within the last 3 months" },
-                { label: "Valid ID", desc: "School ID or any Government ID" }
-              ].map((doc, idx) => (
-                <div key={idx} className="border-2 border-dashed border-gray-200 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4 bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer group">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform text-[var(--green-bright)]">
-                      <FileText className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <p className="font-medium" style={{ color: "var(--green-deep)" }}>{doc.label}</p>
-                      <p className="text-sm text-gray-500">{doc.desc}</p>
-                    </div>
+          <AnimatePresence mode="wait">
+            {currentStep === 0 && (
+              <motion.div
+                key="step-0"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label htmlFor="firstName" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>
+                      First Name <span className="text-red-500">*</span>
+                    </label>
+                    <input 
+                      id="firstName" 
+                      {...register("firstName")} 
+                      placeholder="Enter your first name"
+                      className={`w-full px-4 py-3.5 rounded-xl border-2 transition-all ${
+                        errors.firstName 
+                          ? 'border-red-300 bg-red-50 focus:border-red-500' 
+                          : 'border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30'
+                      } focus:bg-white focus:outline-none`} 
+                    />
+                    {errors.firstName && (
+                      <p className="text-red-500 text-xs flex items-center gap-1 mt-1">
+                        <AlertCircle className="w-3 h-3" /> {errors.firstName.message}
+                      </p>
+                    )}
                   </div>
-                  <div className="px-4 py-2 rounded-lg bg-white border shadow-sm font-medium text-sm flex items-center gap-2 text-[var(--green-deep)]">
-                    <UploadCloud className="w-4 h-4" /> Upload
+                  <div className="space-y-2">
+                    <label htmlFor="lastName" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>
+                      Last Name <span className="text-red-500">*</span>
+                    </label>
+                    <input 
+                      id="lastName" 
+                      {...register("lastName")} 
+                      placeholder="Enter your last name"
+                      className={`w-full px-4 py-3.5 rounded-xl border-2 transition-all ${
+                        errors.lastName 
+                          ? 'border-red-300 bg-red-50 focus:border-red-500' 
+                          : 'border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30'
+                      } focus:bg-white focus:outline-none`} 
+                    />
+                    {errors.lastName && (
+                      <p className="text-red-500 text-xs flex items-center gap-1 mt-1">
+                        <AlertCircle className="w-3 h-3" /> {errors.lastName.message}
+                      </p>
+                    )}
                   </div>
                 </div>
-              ))}
-            </div>
-            <p className="text-sm text-gray-500 mt-6 flex items-start gap-2 bg-blue-50 p-4 rounded-xl text-blue-900">
-              <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-              Note: For this prototype, document upload is simulated. You do not need to upload actual files to proceed.
-            </p>
-          </div>
 
-          {/* Step 4: Account */}
-          <div className={currentStep === 3 ? "block" : "hidden"}>
-            <div className="mb-8">
-              <h2 className="font-display text-3xl font-bold mb-2" style={{ color: "var(--green-deep)" }}>Account Information</h2>
-              <p className="font-body text-[var(--muted)]">Create your account to track your application status.</p>
-            </div>
-            
-            <div className="space-y-4 mb-6">
-              <div className="space-y-2">
-                <label htmlFor="username" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>Username <span className="text-red-500">*</span></label>
-                <input id="username" type="text" placeholder="Choose a username" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[var(--green-bright)]" />
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="password" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>Password <span className="text-red-500">*</span></label>
-                <input id="password" type="password" placeholder="Create a password" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[var(--green-bright)]" />
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="confirmPassword" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>Confirm Password <span className="text-red-500">*</span></label>
-                <input id="confirmPassword" type="password" placeholder="Confirm your password" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[var(--green-bright)]" />
-              </div>
-            </div>
-            
-            <p className="text-sm text-gray-500 flex items-start gap-2 bg-blue-50 p-4 rounded-xl text-blue-900">
-              <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-              Note: For this prototype, account creation is simulated. You can proceed without entering credentials.
-            </p>
-          </div>
-
-          {/* Step 5: Review */}
-          <div className={currentStep === 4 ? "block" : "hidden"}>
-            <div className="mb-8">
-              <h2 className="font-display text-3xl font-bold mb-2" style={{ color: "var(--green-deep)" }}>Review & Submit</h2>
-              <p className="font-body text-[var(--muted)]">Please review your application details before submitting.</p>
-            </div>
-            
-            <div className="bg-[var(--cream)] rounded-2xl p-6 md:p-8 space-y-8 border border-[var(--sand)]">
-              <div>
-                <h3 className="font-mono text-xs uppercase tracking-widest text-[var(--green-mid)] mb-4 border-b border-[var(--sand)] pb-2">Personal Details</h3>
-                <div className="grid grid-cols-2 gap-y-4 text-sm">
-                  <div><p className="text-gray-500">Full Name</p><p className="font-medium text-[var(--ink)]">{getValues("firstName")} {getValues("lastName")}</p></div>
-                  <div><p className="text-gray-500">Email</p><p className="font-medium text-[var(--ink)]">{getValues("email") || "—"}</p></div>
-                  <div><p className="text-gray-500">Phone</p><p className="font-medium text-[var(--ink)]">{getValues("phone") || "—"}</p></div>
-                  <div className="col-span-2"><p className="text-gray-500">Address</p><p className="font-medium text-[var(--ink)]">{getValues("address") || "—"}</p></div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                  <div className="space-y-2">
+                    <label htmlFor="email" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>
+                      Email Address <span className="text-red-500">*</span>
+                    </label>
+                    <input 
+                      id="email" 
+                      type="email" 
+                      {...register("email")} 
+                      placeholder="your.email@example.com"
+                      className={`w-full px-4 py-3.5 rounded-xl border-2 transition-all ${
+                        errors.email 
+                          ? 'border-red-300 bg-red-50 focus:border-red-500' 
+                          : 'border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30'
+                      } focus:bg-white focus:outline-none`} 
+                    />
+                    {errors.email && (
+                      <p className="text-red-500 text-xs flex items-center gap-1 mt-1">
+                        <AlertCircle className="w-3 h-3" /> {errors.email.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="phone" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>
+                      Mobile Number <span className="text-red-500">*</span>
+                    </label>
+                    <input 
+                      id="phone" 
+                      type="tel" 
+                      placeholder="09XX XXX XXXX"
+                      {...register("phone")} 
+                      className={`w-full px-4 py-3.5 rounded-xl border-2 transition-all ${
+                        errors.phone 
+                          ? 'border-red-300 bg-red-50 focus:border-red-500' 
+                          : 'border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30'
+                      } focus:bg-white focus:outline-none`} 
+                    />
+                    {errors.phone && (
+                      <p className="text-red-500 text-xs flex items-center gap-1 mt-1">
+                        <AlertCircle className="w-3 h-3" /> {errors.phone.message}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              <div>
-                <h3 className="font-mono text-xs uppercase tracking-widest text-[var(--green-mid)] mb-4 border-b border-[var(--sand)] pb-2">Education</h3>
-                <div className="grid grid-cols-2 gap-y-4 text-sm">
-                  <div className="col-span-2"><p className="text-gray-500">School / University</p><p className="font-medium text-[var(--ink)]">{getValues("schoolName") || "—"}</p></div>
-                  <div><p className="text-gray-500">Course / Program</p><p className="font-medium text-[var(--ink)]">{getValues("course") || "—"}</p></div>
-                  <div><p className="text-gray-500">Year Level</p><p className="font-medium text-[var(--ink)]">{getValues("yearLevel") ? `Year ${getValues("yearLevel")}` : "—"}</p></div>
-                  <div><p className="text-gray-500">GWA</p><p className="font-medium text-[var(--ink)]">{getValues("gwa") || "—"}</p></div>
+                <div className="space-y-2 mt-6">
+                  <label htmlFor="address" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>
+                    Full Address in San Pablo City <span className="text-red-500">*</span>
+                  </label>
+                  <textarea 
+                    id="address" 
+                    rows={3} 
+                    {...register("address")} 
+                    placeholder="House No., Street, Barangay, City"
+                    className={`w-full px-4 py-3.5 rounded-xl border-2 transition-all resize-none ${
+                      errors.address 
+                        ? 'border-red-300 bg-red-50 focus:border-red-500' 
+                        : 'border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30'
+                    } focus:bg-white focus:outline-none`} 
+                  />
+                  {errors.address && (
+                    <p className="text-red-500 text-xs flex items-center gap-1 mt-1">
+                      <AlertCircle className="w-3 h-3" /> {errors.address.message}
+                    </p>
+                  )}
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            )}
 
-            <div className="mt-6 flex items-start gap-3">
-              <input type="checkbox" id="terms" required className="mt-1 w-4 h-4 text-[var(--green-deep)] border-gray-300 rounded focus:ring-[var(--green-bright)]" />
-              <label htmlFor="terms" className="text-sm text-gray-600 leading-relaxed">
-                I hereby certify that all information provided in this application is true and correct to the best of my knowledge. I understand that any false information may lead to the rejection of my application or revocation of the scholarship.
-              </label>
-            </div>
-          </div>
+            {currentStep === 1 && (
+              <motion.div
+                key="step-1"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="space-y-2">
+                  <label htmlFor="schoolName" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>
+                    Name of School / University <span className="text-red-500">*</span>
+                  </label>
+                  <input 
+                    id="schoolName" 
+                    {...register("schoolName")} 
+                    placeholder="e.g., Laguna State Polytechnic University"
+                    className={`w-full px-4 py-3.5 rounded-xl border-2 transition-all ${
+                      errors.schoolName 
+                        ? 'border-red-300 bg-red-50 focus:border-red-500' 
+                        : 'border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30'
+                    } focus:bg-white focus:outline-none`} 
+                  />
+                  {errors.schoolName && (
+                    <p className="text-red-500 text-xs flex items-center gap-1 mt-1">
+                      <AlertCircle className="w-3 h-3" /> {errors.schoolName.message}
+                    </p>
+                  )}
+                </div>
 
-          {/* Navigation Buttons */}
-          <div className="mt-10 pt-6 border-t border-gray-100 flex items-center justify-between">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                  <div className="space-y-2">
+                    <label htmlFor="course" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>
+                      Course / Program <span className="text-red-500">*</span>
+                    </label>
+                    <input 
+                      id="course" 
+                      {...register("course")} 
+                      placeholder="e.g., Bachelor of Science in Information Technology"
+                      className={`w-full px-4 py-3.5 rounded-xl border-2 transition-all ${
+                        errors.course 
+                          ? 'border-red-300 bg-red-50 focus:border-red-500' 
+                          : 'border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30'
+                      } focus:bg-white focus:outline-none`} 
+                    />
+                    {errors.course && (
+                      <p className="text-red-500 text-xs flex items-center gap-1 mt-1">
+                        <AlertCircle className="w-3 h-3" /> {errors.course.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="yearLevel" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>
+                      Year Level <span className="text-red-500">*</span>
+                    </label>
+                    <select 
+                      id="yearLevel" 
+                      {...register("yearLevel")} 
+                      className={`w-full px-4 py-3.5 rounded-xl border-2 transition-all appearance-none ${
+                        errors.yearLevel 
+                          ? 'border-red-300 bg-red-50 focus:border-red-500' 
+                          : 'border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30'
+                      } focus:bg-white focus:outline-none`}
+                      style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundPosition: "right 1rem center", backgroundSize: "1.25rem" }}
+                    >
+                      <option value="">Select year level...</option>
+                      <option value="1">1st Year</option>
+                      <option value="2">2nd Year</option>
+                      <option value="3">3rd Year</option>
+                      <option value="4">4th Year</option>
+                      <option value="5">5th Year</option>
+                    </select>
+                    {errors.yearLevel && (
+                      <p className="text-red-500 text-xs flex items-center gap-1 mt-1">
+                        <AlertCircle className="w-3 h-3" /> {errors.yearLevel.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-2 mt-6">
+                  <label htmlFor="gwa" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>
+                    Latest GWA <span className="text-red-500">*</span>
+                  </label>
+                  <input 
+                    id="gwa" 
+                    placeholder="e.g., 1.50 or 92"
+                    {...register("gwa")} 
+                    className={`w-full md:w-1/2 px-4 py-3.5 rounded-xl border-2 transition-all ${
+                      errors.gwa 
+                        ? 'border-red-300 bg-red-50 focus:border-red-500' 
+                        : 'border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30'
+                    } focus:bg-white focus:outline-none`} 
+                  />
+                  {errors.gwa && (
+                    <p className="text-red-500 text-xs flex items-center gap-1 mt-1">
+                      <AlertCircle className="w-3 h-3" /> {errors.gwa.message}
+                    </p>
+                  )}
+                  <p className="text-xs mt-2" style={{ color: "var(--muted)" }}>Decimal (1.00-5.00) or percentage (60-100)</p>
+                </div>
+              </motion.div>
+            )}
+
+            {currentStep === 2 && (
+              <motion.div
+                key="step-2"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="space-y-4">
+                  {[
+                    { label: "Certificate of Residency", desc: "Issued by Barangay (last 3 months)", required: true },
+                    { label: "School ID / Enrollment Certificate", desc: "Current semester enrollment", required: true },
+                    { label: "Valid Government ID", desc: "PSA, Passport, or any gov't-issued ID", required: true },
+                    { label: "Recent 2x2 Photo", desc: "White background, professional attire", required: false },
+                  ].map((doc, idx) => (
+                    <div 
+                      key={idx} 
+                      className="border-2 border-dashed rounded-2xl p-5 flex flex-col md:flex-row items-center justify-between gap-4 transition-all hover:border-[var(--green-bright)] cursor-pointer"
+                      style={{ borderColor: "var(--sand)", background: "var(--cream)" }}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div 
+                          className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                          style={{ background: "var(--green-deep)", color: "white" }}
+                        >
+                          <FileText className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <p className="font-medium" style={{ color: "var(--green-deep)" }}>
+                            {doc.label} {doc.required && <span className="text-red-500">*</span>}
+                          </p>
+                          <p className="text-sm" style={{ color: "var(--muted)" }}>{doc.desc}</p>
+                        </div>
+                      </div>
+                      <div 
+                        className="px-5 py-2.5 rounded-xl font-medium text-sm flex items-center gap-2 transition-all hover:opacity-80"
+                        style={{ background: "var(--green-deep)", color: "white" }}
+                      >
+                        <UploadCloud className="w-4 h-4" /> Upload
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div 
+                  className="mt-5 p-4 rounded-xl flex items-center gap-3"
+                  style={{ background: "var(--parchment)" }}
+                >
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" style={{ color: "var(--green-bright)" }} />
+                  <p className="text-sm" style={{ color: "var(--muted)" }}>
+                    Accepted: PDF, JPG, PNG (max 10MB per file)
+                  </p>
+                </div>
+              </motion.div>
+            )}
+
+            {currentStep === 3 && (
+              <motion.div
+                key="step-3"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div 
+                  className="p-5 rounded-2xl mb-6 flex items-start gap-4"
+                  style={{ background: "rgba(45, 106, 79, 0.06)", border: "1px solid rgba(45, 106, 79, 0.1)" }}
+                >
+                  <Shield className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: "var(--green-mid)" }} />
+                  <div>
+                    <p className="font-medium mb-1" style={{ color: "var(--green-deep)" }}>Create Your Account</p>
+                    <p className="text-sm" style={{ color: "var(--muted)" }}>Track your application status and receive updates.</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-5">
+                  <div className="space-y-2">
+                    <label htmlFor="username" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>
+                      Username <span className="text-red-500">*</span>
+                    </label>
+                    <input 
+                      id="username" 
+                      type="text" 
+                      placeholder="Choose a username"
+                      className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30 focus:bg-white focus:outline-none transition-all" 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="password" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>
+                      Password <span className="text-red-500">*</span>
+                    </label>
+                    <input 
+                      id="password" 
+                      type="password" 
+                      placeholder="Create a strong password"
+                      className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30 focus:bg-white focus:outline-none transition-all" 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="confirmPassword" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>
+                      Confirm Password <span className="text-red-500">*</span>
+                    </label>
+                    <input 
+                      id="confirmPassword" 
+                      type="password" 
+                      placeholder="Confirm your password"
+                      className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30 focus:bg-white focus:outline-none transition-all" 
+                    />
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {currentStep === 4 && (
+              <motion.div
+                key="step-4"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div 
+                  className="rounded-2xl p-6 md:p-8 space-y-6"
+                  style={{ background: "var(--cream)", border: "1px solid var(--sand)" }}
+                >
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <User className="w-4 h-4" style={{ color: "var(--green-bright)" }} />
+                      <h3 className="text-[10px] uppercase tracking-widest font-semibold" style={{ color: "var(--green-mid)" }}>
+                        Personal Information
+                      </h3>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                      <div className="p-4 rounded-xl bg-white border" style={{ borderColor: "var(--sand)" }}>
+                        <p className="text-xs mb-1" style={{ color: "var(--muted)" }}>Full Name</p>
+                        <p className="font-medium" style={{ color: "var(--green-deep)" }}>
+                          {getValues("firstName")} {getValues("lastName")}
+                        </p>
+                      </div>
+                      <div className="p-4 rounded-xl bg-white border" style={{ borderColor: "var(--sand)" }}>
+                        <p className="text-xs mb-1" style={{ color: "var(--muted)" }}>Email Address</p>
+                        <p className="font-medium" style={{ color: "var(--green-deep)" }}>{getValues("email") || "—"}</p>
+                      </div>
+                      <div className="p-4 rounded-xl bg-white border" style={{ borderColor: "var(--sand)" }}>
+                        <p className="text-xs mb-1" style={{ color: "var(--muted)" }}>Mobile Number</p>
+                        <p className="font-medium" style={{ color: "var(--green-deep)" }}>{getValues("phone") || "—"}</p>
+                      </div>
+                      <div className="p-4 rounded-xl bg-white border sm:col-span-2" style={{ borderColor: "var(--sand)" }}>
+                        <p className="text-xs mb-1" style={{ color: "var(--muted)" }}>Address</p>
+                        <p className="font-medium" style={{ color: "var(--green-deep)" }}>{getValues("address") || "—"}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <GraduationCap className="w-4 h-4" style={{ color: "var(--green-bright)" }} />
+                      <h3 className="text-[10px] uppercase tracking-widest font-semibold" style={{ color: "var(--green-mid)" }}>
+                        Educational Background
+                      </h3>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                      <div className="p-4 rounded-xl bg-white border sm:col-span-2" style={{ borderColor: "var(--sand)" }}>
+                        <p className="text-xs mb-1" style={{ color: "var(--muted)" }}>School / University</p>
+                        <p className="font-medium" style={{ color: "var(--green-deep)" }}>{getValues("schoolName") || "—"}</p>
+                      </div>
+                      <div className="p-4 rounded-xl bg-white border" style={{ borderColor: "var(--sand)" }}>
+                        <p className="text-xs mb-1" style={{ color: "var(--muted)" }}>Course / Program</p>
+                        <p className="font-medium" style={{ color: "var(--green-deep)" }}>{getValues("course") || "—"}</p>
+                      </div>
+                      <div className="p-4 rounded-xl bg-white border" style={{ borderColor: "var(--sand)" }}>
+                        <p className="text-xs mb-1" style={{ color: "var(--muted)" }}>Year Level</p>
+                        <p className="font-medium" style={{ color: "var(--green-deep)" }}>
+                          {getValues("yearLevel") ? `${getValues("yearLevel")}${getValues("yearLevel") === "1" ? "st" : getValues("yearLevel") === "2" ? "nd" : getValues("yearLevel") === "3" ? "rd" : "th"} Year` : "—"}
+                        </p>
+                      </div>
+                      <div className="p-4 rounded-xl bg-white border" style={{ borderColor: "var(--sand)" }}>
+                        <p className="text-xs mb-1" style={{ color: "var(--muted)" }}>GWA</p>
+                        <p className="font-medium" style={{ color: "var(--green-deep)" }}>{getValues("gwa") || "—"}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6 flex items-start gap-4 p-5 rounded-xl" style={{ background: "var(--parchment)", border: "1px solid rgba(45, 106, 79, 0.1)" }}>
+                  <input 
+                    type="checkbox" 
+                    id="terms" 
+                    required 
+                    className="mt-0.5 w-4 h-4 rounded cursor-pointer"
+                    style={{ 
+                      accentColor: "var(--green-deep)",
+                    }} 
+                  />
+                  <label htmlFor="terms" className="text-sm leading-relaxed cursor-pointer" style={{ color: "var(--muted)" }}>
+                    <span className="font-medium" style={{ color: "var(--green-deep)" }}>Declaration:</span> I certify that all information provided is true and correct. False information may lead to rejection or revocation of the scholarship.
+                  </label>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <div className="mt-8 pt-6 flex items-center justify-between gap-4" style={{ borderTop: "1px solid var(--sand)" }}>
             <button
               type="button"
               onClick={prevStep}
-              className={`px-6 py-3 rounded-full font-medium transition-colors flex items-center gap-2 ${currentStep === 0 ? 'invisible' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+              className="px-6 py-3 rounded-full font-medium transition-all flex items-center gap-2"
+              style={{
+                background: currentStep === 0 ? "transparent" : "#f9fafb",
+                color: currentStep === 0 ? "transparent" : "var(--green-deep)",
+                border: currentStep === 0 ? "none" : "1px solid #e5e7eb",
+                cursor: currentStep === 0 ? "default" : "pointer",
+              }}
             >
-              <ChevronLeft className="w-4 h-4" /> Back
+              <ChevronLeft className="w-4 h-4" /> Previous
             </button>
             
             {currentStep < steps.length - 1 ? (
               <button
                 type="button"
                 onClick={nextStep}
-                className="px-8 py-3 rounded-full font-medium transition-all flex items-center gap-2 hover:opacity-90"
-                style={{ background: "var(--green-deep)", color: "var(--cream)" }}
+                className="px-8 py-3 rounded-full font-medium transition-all flex items-center gap-2 hover:opacity-90 shadow-md"
+                style={{ background: "var(--green-deep)", color: "white" }}
               >
-                Next Step <ChevronRight className="w-4 h-4" />
+                Continue <ChevronRight className="w-4 h-4" />
               </button>
             ) : (
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-8 py-3 rounded-full font-medium transition-all flex items-center gap-2 hover:opacity-90 disabled:opacity-70"
-                style={{ background: "#F97316", color: "white" }}
+                className="px-10 py-3 rounded-full font-medium transition-all flex items-center gap-2 hover:opacity-90 disabled:opacity-70 shadow-md"
+                style={{ background: "#f97316", color: "white" }}
               >
                 {isSubmitting ? (
-                  <><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</>
+                  <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>
                 ) : (
                   <><CheckCircle2 className="w-4 h-4" /> Submit Application</>
                 )}
               </button>
             )}
           </div>
-
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 }
