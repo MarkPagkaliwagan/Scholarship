@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@300;400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -21,7 +21,7 @@ html { scroll-behavior: smooth; }
 body {
   background-color: var(--cream);
   color: var(--ink);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 /* Subtle grain */
@@ -36,7 +36,7 @@ body::before {
 }
 
 @layer utilities {
-  .font-display { font-family: 'Lora', serif; }
-  .font-body    { font-family: 'DM Sans', sans-serif; }
-  .font-mono    { font-family: 'DM Mono', monospace; }
+  .font-display { font-family: 'Crimson Pro', serif; }
+  .font-body    { font-family: 'Inter', sans-serif; }
+  h1, .h1 { font-family: 'Playfair Display', serif; }
 }

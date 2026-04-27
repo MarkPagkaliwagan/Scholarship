@@ -20,9 +20,9 @@ export default function TrackPage() {
         <div className="mb-16 text-center">
           <p className="font-mono text-xs tracking-[0.3em] uppercase mb-4"
             style={{ color: "var(--green-bright)" }}>Application Status</p>
-          <h1 className="font-display text-5xl md:text-6xl font-bold mb-4"
+          <h1 className="h1 font-display text-5xl md:text-6xl font-bold mb-4"
             style={{ color: "var(--green-deep)" }}>
-            Track Your<br /><span className="italic">Application</span>
+            Track Your Application<br />
           </h1>
           <p className="font-body text-base leading-relaxed" style={{ color: "var(--muted)" }}>
             Enter your reference code to check your current application status.
