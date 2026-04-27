@@ -1,16 +1,59 @@
 "use client";
 
 import { useState } from "react";
-import { Search } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
+
+type ApplicationResult = {
+  applicationId: string;
+  status: string;
+  remarks: string | null;
+  submittedAt: string;
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  pending: "Pending",
+  in_review: "In Review",
+  approved: "Approved",
+  rejected: "Rejected",
+};
+
+const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
+  pending: { bg: "#fef3c7", text: "#92400e" },
+  in_review: { bg: "#dbeafe", text: "#1e40af" },
+  approved: { bg: "#dcfce7", text: "#166534" },
+  rejected: { bg: "#fee2e2", text: "#991b1b" },
+};
 
 export default function TrackPage() {
   const [code, setCode] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<ApplicationResult | null>(null);
+  const [notFound, setNotFound] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    if (!code.trim()) return;
+
+    setLoading(true);
+    setResult(null);
+    setNotFound(false);
+
+    try {
+      const res = await fetch(`/api/applications/track?id=${encodeURIComponent(code.trim())}`);
+      if (res.status === 404) {
+        setNotFound(true);
+        return;
+      }
+      if (!res.ok) throw new Error();
+      setResult(await res.json());
+    } catch {
+      setNotFound(true);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const statusColor = result ? (STATUS_COLORS[result.status] ?? STATUS_COLORS.pending) : null;
 
   return (
     <main className="min-h-screen pt-28 pb-24" style={{ background: "var(--cream)" }}>
@@ -22,7 +65,7 @@ export default function TrackPage() {
             style={{ color: "var(--green-bright)" }}>Application Status</p>
           <h1 className="h1 font-display text-5xl md:text-6xl font-bold mb-4"
             style={{ color: "var(--green-deep)" }}>
-            Track Your Application<br />
+            Track Your Application
           </h1>
           <p className="font-body text-base leading-relaxed" style={{ color: "var(--muted)" }}>
             Enter your reference code to check your current application status.
@@ -42,52 +85,62 @@ export default function TrackPage() {
                 type="text"
                 value={code}
                 onChange={e => setCode(e.target.value)}
-                placeholder="e.g. SCH-2025-0001"
+                placeholder="e.g. SPC-AB12CD"
                 className="flex-1 px-4 py-3 rounded-xl border text-sm font-body bg-white outline-none focus:ring-2 transition"
                 style={{ borderColor: "var(--sand)", color: "var(--ink)" }}
               />
-              <button type="submit"
-                className="px-6 py-3 rounded-xl text-sm font-medium font-body flex items-center gap-2 transition hover:opacity-90"
-                style={{ background: "var(--green-deep)", color: "var(--cream)" }}>
-                <Search className="w-4 h-4" />
+              <button
+                type="submit"
+                disabled={loading || !code.trim()}
+                className="px-6 py-3 rounded-xl text-sm font-medium font-body flex items-center gap-2 transition hover:opacity-90 disabled:opacity-60"
+                style={{ background: "var(--green-deep)", color: "var(--cream)" }}
+              >
+                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
                 Search
               </button>
             </div>
           </form>
 
-          {/* Dummy result */}
-          {submitted && code && (
+          {result && (
             <div className="mt-8 pt-8 border-t" style={{ borderColor: "var(--sand)" }}>
               <p className="font-mono text-xs tracking-widest uppercase mb-4"
-                style={{ color: "var(--muted)" }}>Result for "{code}"</p>
+                style={{ color: "var(--muted)" }}>Result for &ldquo;{result.applicationId}&rdquo;</p>
               <div className="flex items-center justify-between p-4 rounded-xl"
                 style={{ background: "var(--cream)", border: "1px solid var(--sand)" }}>
                 <div>
                   <p className="font-display text-lg font-semibold" style={{ color: "var(--green-deep)" }}>
-                    Lorem Ipsum Scholarship
+                    SPC Economic Zone Scholarship
                   </p>
                   <p className="font-body text-sm" style={{ color: "var(--muted)" }}>
-                    Submitted: January 1, 2025
+                    Submitted:{" "}
+                    {new Date(result.submittedAt).toLocaleDateString("en-PH", { dateStyle: "long" })}
                   </p>
+                  {result.remarks && (
+                    <p className="font-body text-sm mt-1" style={{ color: "var(--ink)" }}>
+                      {result.remarks}
+                    </p>
+                  )}
                 </div>
-                <span className="px-4 py-1.5 rounded-full text-xs font-mono font-medium"
-                  style={{ background: "#fef3c7", color: "#92400e" }}>
-                  PENDING
-                </span>
+                {statusColor && (
+                  <span className="px-4 py-1.5 rounded-full text-xs font-mono font-medium"
+                    style={{ background: statusColor.bg, color: statusColor.text }}>
+                    {STATUS_LABELS[result.status] ?? result.status.toUpperCase()}
+                  </span>
+                )}
               </div>
             </div>
           )}
 
-          {submitted && !code && (
+          {notFound && (
             <p className="mt-6 font-body text-sm text-center" style={{ color: "#ef4444" }}>
-              Please enter a reference code.
+              No application found for &ldquo;{code}&rdquo;. Please check your reference code.
             </p>
           )}
         </div>
 
         {/* Info note */}
         <p className="font-mono text-xs text-center tracking-wider" style={{ color: "var(--muted)" }}>
-          Reference codes follow the format SCH-YYYY-XXXX. Check your email for your code.
+          Reference codes follow the format SPC-XXXXXX. Check your email for your code.
         </p>
 
       </div>
