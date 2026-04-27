@@ -50,7 +50,10 @@ export default function AboutPage() {
                 style={{ color: "var(--green-light)" }}>{p.number}</span>
               <h2 className="font-display text-2xl font-semibold mt-2 mb-3"
                 style={{ color: "var(--green-deep)" }}>{p.title}</h2>
-              <p className="font-body text-sm leading-relaxed" style={{ color: "var(--muted)" }}>{p.body}</p>
+              {typeof p.body === 'string' 
+                ? <p className="font-body text-sm leading-relaxed" style={{ color: "var(--muted)" }}>{p.body}</p>
+                : p.body
+              }
             </div>
           ))}
         </div>
