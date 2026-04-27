@@ -1,53 +1,51 @@
 import { Mail, Phone, MapPin, Clock } from "lucide-react";
 
 const info = [
-  { icon: Mail,   label: "Email",   value: "scholarship@sanpablo.gov.ph" },
-  { icon: Phone,  label: "Phone",   value: "(049) 123-4567" },
+  { icon: Mail, label: "Email", value: "scholarship@sanpablo.gov.ph" },
+  { icon: Phone, label: "Phone", value: "(049) 123-4567" },
   { icon: MapPin, label: "Address", value: "City Hall, San Pablo City, Laguna" },
-  { icon: Clock,  label: "Hours",   value: "Mon–Fri, 8:00 AM – 5:00 PM" },
+  { icon: Clock, label: "Hours", value: "Mon-Fri, 8:00 AM - 5:00 PM" },
 ];
 
 export default function ContactPage() {
   return (
-    <main className="min-h-screen pt-28 pb-24" style={{ background: "var(--cream)" }}>
+    <main className="min-h-screen pt-40 pb-24" style={{ background: "var(--cream)" }}>
       <div className="max-w-5xl mx-auto px-6">
 
-        {/* Header */}
-        <div className="mb-20">
-          <p className="font-mono text-xs tracking-[0.3em] uppercase mb-4"
-            style={{ color: "var(--green-bright)" }}>Get in Touch</p>
-          <h1 className="h1 font-display text-6xl md:text-7xl font-bold leading-tight mb-6"
-            style={{ color: "var(--green-deep)" }}>
-            Contact Us<br />
-          </h1>
-          <p className="font-body text-lg max-w-lg leading-relaxed" style={{ color: "var(--muted)" }}>
-             Have questions about the scholarship program? We're here to help.
-          </p>
-        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+          <div>
+            <div className="mb-8">
+              <p className="font-mono text-xs tracking-[0.3em] uppercase mb-4"
+                style={{ color: "var(--green-bright)" }}>Get in Touch</p>
+              <h2 className="font-display text-3xl font-bold mb-4" style={{ color: "var(--green-deep)" }}>
+                Contact Us
+              </h2>
+              <p className="font-body text-base leading-relaxed" style={{ color: "var(--muted)" }}>
+                Have questions about the scholarship program? We're here to help.
+              </p>
+            </div>
 
-          {/* Contact info */}
-          <div className="space-y-8">
-            {info.map((item) => (
-              <div key={item.label} className="flex gap-4">
-                <div className="w-10 h-10 flex items-center justify-center rounded-xl flex-shrink-0"
-                  style={{ background: "var(--green-deep)" }}>
-                  <item.icon className="w-4 h-4" style={{ color: "var(--cream)" }} />
+            <div className="space-y-6">
+              {info.map((item) => (
+                <div key={item.label} className="flex gap-4">
+                  <div className="w-10 h-10 flex items-center justify-center rounded-xl flex-shrink-0"
+                    style={{ background: "var(--green-deep)" }}>
+                    <item.icon className="w-4 h-4" style={{ color: "var(--cream)" }} />
+                  </div>
+                  <div>
+                    <p className="font-mono text-xs tracking-widest uppercase mb-0.5"
+                      style={{ color: "var(--muted)" }}>{item.label}</p>
+                    <p className="font-body text-sm font-medium" style={{ color: "var(--green-deep)" }}>
+                      {item.value}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-mono text-xs tracking-widest uppercase mb-0.5"
-                    style={{ color: "var(--muted)" }}>{item.label}</p>
-                  <p className="font-body text-sm font-medium" style={{ color: "var(--green-deep)" }}>
-                    {item.value}
-                  </p>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
-          {/* Simple form */}
-          <div className="p-8 rounded-2xl border" style={{ background: "var(--parchment)", borderColor: "var(--sand)" }}>
+          <div className="p-8 rounded-2xl border w-full" style={{ background: "var(--parchment)", borderColor: "var(--sand)" }}>
             <h2 className="font-display text-xl font-semibold mb-6" style={{ color: "var(--green-deep)" }}>
               Send a Message
             </h2>
@@ -76,7 +74,7 @@ export default function ContactPage() {
               <button
                 className="mt-2 px-6 py-3 rounded-xl text-sm font-medium font-body transition hover:opacity-90"
                 style={{ background: "var(--green-deep)", color: "var(--cream)" }}>
-                Send Message →
+                Send Message
               </button>
             </div>
           </div>
