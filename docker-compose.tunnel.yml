@@ -1,0 +1,9 @@
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --config /etc/cloudflared/config.yml run
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ~/.cloudflared:/etc/cloudflared:ro

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { authClient } from "@/lib/auth-client";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -49,6 +50,11 @@ export default function ApplicationForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [applicationId, setApplicationId] = useState("");
+  const [accountUsername, setAccountUsername] = useState("");
+  const [accountPassword, setAccountPassword] = useState("");
+  const [accountConfirmPassword, setAccountConfirmPassword] = useState("");
+  const [accountError, setAccountError] = useState<string | null>(null);
+  const [accountCreated, setAccountCreated] = useState(false);
 
   const {
     register,
@@ -67,6 +73,23 @@ export default function ApplicationForm() {
       isValid = await trigger(["firstName", "lastName", "email", "phone", "address"]);
     } else if (currentStep === 1) {
       isValid = await trigger(["schoolName", "course", "yearLevel", "gwa"]);
+    } else if (currentStep === 3) {
+      if (!accountUsername.trim()) { setAccountError("Username is required."); return; }
+      if (accountPassword.length < 8) { setAccountError("Password must be at least 8 characters."); return; }
+      if (accountPassword !== accountConfirmPassword) { setAccountError("Passwords do not match."); return; }
+      if (!accountCreated) {
+        setIsSubmitting(true);
+        setAccountError(null);
+        const { error } = await authClient.signUp.email({
+          email: getValues("email"),
+          password: accountPassword,
+          name: accountUsername,
+        });
+        setIsSubmitting(false);
+        if (error) { setAccountError(error.message ?? "Account creation failed."); return; }
+        setAccountCreated(true);
+      }
+      isValid = true;
     } else {
       isValid = true;
     }
@@ -511,35 +534,46 @@ export default function ApplicationForm() {
                     <label htmlFor="username" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>
                       Username <span className="text-red-500">*</span>
                     </label>
-                    <input 
-                      id="username" 
-                      type="text" 
+                    <input
+                      id="username"
+                      type="text"
+                      value={accountUsername}
+                      onChange={(e) => { setAccountUsername(e.target.value); setAccountError(null); }}
                       placeholder="Choose a username"
-                      className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30 focus:bg-white focus:outline-none transition-all" 
+                      className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30 focus:bg-white focus:outline-none transition-all"
                     />
                   </div>
                   <div className="space-y-2">
                     <label htmlFor="password" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>
                       Password <span className="text-red-500">*</span>
                     </label>
-                    <input 
-                      id="password" 
-                      type="password" 
-                      placeholder="Create a strong password"
-                      className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30 focus:bg-white focus:outline-none transition-all" 
+                    <input
+                      id="password"
+                      type="password"
+                      value={accountPassword}
+                      onChange={(e) => { setAccountPassword(e.target.value); setAccountError(null); }}
+                      placeholder="Create a strong password (min 8 chars)"
+                      className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30 focus:bg-white focus:outline-none transition-all"
                     />
                   </div>
                   <div className="space-y-2">
                     <label htmlFor="confirmPassword" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>
                       Confirm Password <span className="text-red-500">*</span>
                     </label>
-                    <input 
-                      id="confirmPassword" 
-                      type="password" 
+                    <input
+                      id="confirmPassword"
+                      type="password"
+                      value={accountConfirmPassword}
+                      onChange={(e) => { setAccountConfirmPassword(e.target.value); setAccountError(null); }}
                       placeholder="Confirm your password"
-                      className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30 focus:bg-white focus:outline-none transition-all" 
+                      className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30 focus:bg-white focus:outline-none transition-all"
                     />
                   </div>
+                  {accountError && (
+                    <p className="text-red-500 text-xs flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" /> {accountError}
+                    </p>
+                  )}
                 </div>
               </motion.div>
             )}
