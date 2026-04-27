@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import {
@@ -583,16 +583,22 @@ function LoginPanel({ open, onClose }: LoginPanelProps) {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
+function LoginAutoOpen({ onOpen }: { onOpen: () => void }) {
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    if (searchParams.get("login") === "1") onOpen();
+  }, [searchParams, onOpen]);
+  return null;
+}
+
 export default function HomePage() {
   const [loginOpen, setLoginOpen] = useState(false);
-  const searchParams = useSearchParams();
-
-  useEffect(() => {
-    if (searchParams.get("login") === "1") setLoginOpen(true);
-  }, [searchParams]);
 
   return (
     <>
+      <Suspense fallback={null}>
+        <LoginAutoOpen onOpen={() => setLoginOpen(true)} />
+      </Suspense>
       <LoginPanel open={loginOpen} onClose={() => setLoginOpen(false)} />
 
       <main
