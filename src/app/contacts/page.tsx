@@ -21,8 +21,7 @@ export default function ContactPage() {
             Contact Us<br />
           </h1>
           <p className="font-body text-lg max-w-lg leading-relaxed" style={{ color: "var(--muted)" }}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Have questions about
-            the scholarship program? We're here to help.
+             Have questions about the scholarship program? We're here to help.
           </p>
         </div>
 
