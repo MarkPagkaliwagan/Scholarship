@@ -4,18 +4,14 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
-import { User, GraduationCap, FileText, Home, Users, LogOut } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-
-const menuItems = [
-  { href: "/dashboard", label: "Dashboard", icon: Home },
-  { href: "/profile", label: "My Profile", icon: User },
-];
+import { User, GraduationCap, Users } from "lucide-react";
+import { motion } from "framer-motion";
+import Sidebar from "@/components/Sidebar";
 
 export default function DashboardPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<null | { name?: string; email?: string }>(null);
   const [loading, setLoading] = useState(true);
   const [sidebarHover, setSidebarHover] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -33,7 +29,7 @@ export default function DashboardPage() {
       setLoading(false);
     };
     checkAuth();
-  }, []);
+  }, [router]);
 
   const handleSignOut = async () => {
     await authClient.signOut();
@@ -79,9 +75,11 @@ export default function DashboardPage() {
         </div>
 
         <nav className="flex-1 px-3 py-4 space-y-1">
-          {menuItems.map((item) => {
+          {[
+            { href: "/dashboard", label: "Dashboard", icon: Users },
+            { href: "/profile", label: "My Profile", icon: User },
+          ].map((item) => {
             const isActive = pathname === item.href;
-            const Icon = item.icon;
             return (
               <Link
                 key={item.href}
@@ -90,7 +88,7 @@ export default function DashboardPage() {
                   isActive ? "bg-white/20" : "hover:bg-white/10 hover:pl-5"
                 }`}
               >
-                <Icon className="w-5 h-5 flex-shrink-0" />
+                <item.icon className="w-5 h-5 flex-shrink-0" />
                 {sidebarOpen && <span className="font-medium whitespace-nowrap">{item.label}</span>}
               </Link>
             );
@@ -167,7 +165,7 @@ export default function DashboardPage() {
 
           <div className="lg:hidden mt-8">
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              onClick={() => setMobileMenuOpen(true)}
               className="p-2 rounded-lg"
               style={{ background: "var(--green-deep)", color: "white" }}
             >
@@ -175,36 +173,14 @@ export default function DashboardPage() {
             </button>
           </div>
 
-          <AnimatePresence>
-            {mobileMenuOpen && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="lg:hidden mt-4 overflow-hidden"
-                style={{ background: "var(--green-deep)", color: "white" }}
-              >
-                <div className="p-4 flex flex-col gap-2">
-                  {menuItems.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="px-4 py-3 rounded-lg"
-                      style={{ 
-                        background: pathname === item.href ? "rgba(255,255,255,0.2)" : "transparent" 
-                      }}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                  <button onClick={handleSignOut} className="px-4 py-3 rounded-lg text-left">
-                    Sign Out
-                  </button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <Sidebar
+            menuOpen={mobileMenuOpen}
+            setMenuOpen={setMobileMenuOpen}
+            pathname={pathname}
+            user={user}
+            handleSignOut={handleSignOut}
+            isDashboard={true}
+          />
         </div>
       </motion.main>
     </div>

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
-import { User, Home, GraduationCap, FileText, Upload, Save, Loader2, Camera, Mail, Phone, MapPin, Calendar, Book, Award, Users } from "lucide-react";
+import { User, Home, GraduationCap, FileText, Save, Loader2, Camera, Phone, MapPin, Calendar, Book, Award, Users } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Application {
@@ -34,7 +34,7 @@ const menuItems = [
 export default function ProfilePage() {
   const router = useRouter();
   const pathname = usePathname();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<null | { name?: string; email?: string }>(null);
   const [application, setApplication] = useState<Application | null>(null);
   const [loading, setLoading] = useState(true);
   const [sidebarHover, setSidebarHover] = useState(false);
@@ -43,20 +43,6 @@ export default function ProfilePage() {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<Application | null>(null);
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const session = await authClient.getSession();
-      const currentUser = session?.data?.user;
-      if (!currentUser) {
-        router.push("/?login=1");
-        return;
-      }
-      setUser(currentUser);
-      fetchApplication(currentUser.email);
-    };
-    checkAuth();
-  }, []);
 
   const fetchApplication = async (email: string) => {
     try {
@@ -74,6 +60,20 @@ export default function ProfilePage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const session = await authClient.getSession();
+      const currentUser = session?.data?.user;
+      if (!currentUser) {
+        router.push("/?login=1");
+        return;
+      }
+      setUser(currentUser);
+      fetchApplication(currentUser.email);
+    };
+    checkAuth();
+  }, [router]);
 
   const handleSignOut = async () => {
     await authClient.signOut();

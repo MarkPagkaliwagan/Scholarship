@@ -559,7 +559,7 @@ function LoginPanel({ open, onClose }: LoginPanelProps) {
               )}
 
               <p className="text-center font-body text-[13px]" style={{ color: "#7a9485" }}>
-                Don't have an account?{" "}
+                Don&apos;t have an account?{" "}
                 <Link href="/apply" className="font-semibold hover:underline" style={{ color: "#2d6a4f" }}>
                   Apply now
                 </Link>
@@ -673,7 +673,7 @@ export default function HomePage() {
                     backgroundClip: "text",
                   }}
                 >
-                  San Pablo's Future
+                  San Pablo&apos;s Future
                 </span>
               </h1>
 

@@ -1,4 +1,4 @@
-const { Client } = require('pg');
+const { Client } = require('pg'); // eslint-disable-line @typescript-eslint/no-require-imports
 
 const client = new Client({
   host: '127.0.0.1',

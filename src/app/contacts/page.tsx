@@ -22,7 +22,7 @@ export default function ContactPage() {
                 Contact Us
               </h2>
               <p className="font-body text-base leading-relaxed" style={{ color: "var(--muted)" }}>
-                Have questions about the scholarship program? We're here to help.
+                Have questions about the scholarship program? We&apos;re here to help.
               </p>
             </div>
 

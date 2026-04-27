@@ -21,7 +21,7 @@ const EXE_NAME  = process.platform === "win32" ? "cloudflared.exe" : "cloudflare
 const LOCAL_EXE = join(import.meta.dir, EXE_NAME);
 
 const systemCheck = await $`which cloudflared`.quiet().nothrow();
-let EXE_PATH = systemCheck.exitCode === 0
+const EXE_PATH = systemCheck.exitCode === 0
   ? systemCheck.stdout.toString().trim()
   : LOCAL_EXE;
 
