@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 import {
   GraduationCap,
   FileText,
@@ -62,11 +64,13 @@ interface LoginPanelProps {
 }
 
 function LoginPanel({ open, onClose }: LoginPanelProps) {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   // Close on Escape
   useEffect(() => {
@@ -90,8 +94,15 @@ function LoginPanel({ open, onClose }: LoginPanelProps) {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    await new Promise((r) => setTimeout(r, 1500));
+    setLoginError(null);
+    const { error } = await authClient.signIn.email({ email, password });
     setIsLoading(false);
+    if (error) {
+      setLoginError(error.message ?? "Invalid email or password.");
+      return;
+    }
+    onClose();
+    router.push("/apply");
   };
 
   const inputBase =
@@ -350,6 +361,10 @@ function LoginPanel({ open, onClose }: LoginPanelProps) {
                   )}
                 </button>
 
+                {loginError && (
+                  <p className="text-red-500 text-xs text-center -mt-2">{loginError}</p>
+                )}
+
                 {/* Divider */}
                 <div className="flex items-center gap-3 my-1">
                   <div className="flex-1 h-px" style={{ background: "#e5e7eb" }} />
@@ -539,6 +554,10 @@ function LoginPanel({ open, onClose }: LoginPanelProps) {
                 )}
               </button>
 
+              {loginError && (
+                <p className="text-red-500 text-xs text-center">{loginError}</p>
+              )}
+
               <p className="text-center font-body text-[13px]" style={{ color: "#7a9485" }}>
                 Don't have an account?{" "}
                 <Link href="/apply" className="font-semibold hover:underline" style={{ color: "#2d6a4f" }}>
@@ -566,6 +585,11 @@ function LoginPanel({ open, onClose }: LoginPanelProps) {
 
 export default function HomePage() {
   const [loginOpen, setLoginOpen] = useState(false);
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("login") === "1") setLoginOpen(true);
+  }, [searchParams]);
 
   return (
     <>
