@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { authClient } from "@/lib/auth-client";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { authClient } from "@/lib/auth-client";
 import * as z from "zod";
-import { CheckCircle2, ChevronRight, ChevronLeft, UploadCloud, FileText, AlertCircle, Loader2, User, GraduationCap, FolderOpen, UserCog, ClipboardCheck, Shield, Badge } from "lucide-react";
+import { CheckCircle2, ChevronRight, ChevronLeft, UploadCloud, FileText, AlertCircle, Loader2, User, GraduationCap, FolderOpen, UserCog, ClipboardCheck, Shield, Badge, Copy, Check } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -52,9 +52,9 @@ export default function ApplicationForm() {
   const [applicationId, setApplicationId] = useState("");
   const [accountUsername, setAccountUsername] = useState("");
   const [accountPassword, setAccountPassword] = useState("");
-  const [accountConfirmPassword, setAccountConfirmPassword] = useState("");
   const [accountError, setAccountError] = useState<string | null>(null);
   const [accountCreated, setAccountCreated] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const {
     register,
@@ -75,8 +75,7 @@ export default function ApplicationForm() {
       isValid = await trigger(["schoolName", "course", "yearLevel", "gwa"]);
     } else if (currentStep === 3) {
       if (!accountUsername.trim()) { setAccountError("Username is required."); return; }
-      if (accountPassword.length < 8) { setAccountError("Password must be at least 8 characters."); return; }
-      if (accountPassword !== accountConfirmPassword) { setAccountError("Passwords do not match."); return; }
+      if (!accountPassword) { setAccountError("Password is required."); return; }
       if (!accountCreated) {
         setIsSubmitting(true);
         setAccountError(null);
@@ -544,30 +543,45 @@ export default function ApplicationForm() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label htmlFor="password" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>
+                    <label className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>
                       Password <span className="text-red-500">*</span>
                     </label>
-                    <input
-                      id="password"
-                      type="password"
-                      value={accountPassword}
-                      onChange={(e) => { setAccountPassword(e.target.value); setAccountError(null); }}
-                      placeholder="Create a strong password (min 8 chars)"
-                      className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30 focus:bg-white focus:outline-none transition-all"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="confirmPassword" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>
-                      Confirm Password <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      id="confirmPassword"
-                      type="password"
-                      value={accountConfirmPassword}
-                      onChange={(e) => { setAccountConfirmPassword(e.target.value); setAccountError(null); }}
-                      placeholder="Confirm your password"
-                      className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30 focus:bg-white focus:outline-none transition-all"
-                    />
+                    <div className="flex gap-2">
+                      <input
+                        type="password"
+                        value={accountPassword}
+                        readOnly
+                        placeholder="Click Generate Password"
+                        className="flex-1 px-4 py-3.5 rounded-xl border-2 border-gray-100 bg-gray-50/30 focus:outline-none"
+                        style={{ color: accountPassword ? "var(--green-deep)" : "var(--muted)" }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const pwd = "Sp" + Math.random().toString(36).slice(-4).toUpperCase() + Math.random().toString(36).slice(-4) + "!@#$"[0] + Math.floor(Math.random() * 999) + 1;
+                          setAccountPassword(pwd);
+                          setAccountError(null);
+                        }}
+                        className="px-4 py-3 rounded-xl font-medium transition-all"
+                        style={{ background: "var(--green-deep)", color: "white" }}
+                      >
+                        Generate
+                      </button>
+                      {accountPassword && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(accountPassword);
+                            setCopied(true);
+                            setTimeout(() => setCopied(false), 2000);
+                          }}
+                          className="px-4 py-3 rounded-xl font-medium transition-all"
+                          style={{ background: "var(--cream)", color: "var(--green-deep)" }}
+                        >
+                          {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
+                        </button>
+                      )}
+                    </div>
                   </div>
                   {accountError && (
                     <p className="text-red-500 text-xs flex items-center gap-1">

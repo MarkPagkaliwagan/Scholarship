@@ -1,53 +1,69 @@
-import { Client } from 'pg';
+import { db } from '../src/db';
 
-const c = new Client({
-  connectionString: process.env.DATABASE_URL
-});
+const createTables = async () => {
+  try {
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS "user" (
+        "id" text PRIMARY KEY NOT NULL,
+        "name" text NOT NULL,
+        "email" text NOT NULL UNIQUE,
+        "email_verified" boolean NOT NULL,
+        "image" text,
+        "created_at" timestamp NOT NULL,
+        "updated_at" timestamp NOT NULL
+      );
+    `);
+    console.log('Created user table');
 
-await c.connect();
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS "session" (
+        "id" text PRIMARY KEY NOT NULL,
+        "expires_at" timestamp NOT NULL,
+        "token" text NOT NULL UNIQUE,
+        "created_at" timestamp NOT NULL,
+        "updated_at" timestamp NOT NULL,
+        "ip_address" text,
+        "user_agent" text,
+        "user_id" text NOT NULL REFERENCES "user"("id") ON DELETE CASCADE
+      );
+    `);
+    console.log('Created session table');
 
-const result = await c.query(`
-  CREATE TABLE IF NOT EXISTS applications (
-    id SERIAL PRIMARY KEY,
-    application_id VARCHAR(20) UNIQUE NOT NULL,
-    first_name VARCHAR(100) NOT NULL,
-    last_name VARCHAR(100) NOT NULL,
-    email VARCHAR(255) NOT NULL,
-    phone VARCHAR(20) NOT NULL,
-    address TEXT NOT NULL,
-    school_name VARCHAR(255) NOT NULL,
-    course VARCHAR(255) NOT NULL,
-    year_level SMALLINT NOT NULL CHECK (year_level BETWEEN 1 AND 5),
-    gwa NUMERIC(5, 2) NOT NULL,
-    status VARCHAR(20) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'in_review', 'approved', 'rejected')),
-    remarks TEXT,
-    submitted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-  )
-`);
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS "account" (
+        "id" text PRIMARY KEY NOT NULL,
+        "account_id" text NOT NULL,
+        "provider_id" text NOT NULL,
+        "user_id" text NOT NULL REFERENCES "user"("id") ON DELETE CASCADE,
+        "access_token" text,
+        "refresh_token" text,
+        "id_token" text,
+        "access_token_expires_at" timestamp,
+        "refresh_token_expires_at" timestamp,
+        "scope" text,
+        "password" text,
+        "created_at" timestamp NOT NULL,
+        "updated_at" timestamp NOT NULL
+      );
+    `);
+    console.log('Created account table');
 
-console.log('Table created!');
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS "verification" (
+        "id" text PRIMARY KEY NOT NULL,
+        "identifier" text NOT NULL,
+        "value" text NOT NULL,
+        "expires_at" timestamp NOT NULL,
+        "created_at" timestamp,
+        "updated_at" timestamp
+      );
+    `);
+    console.log('Created verification table');
 
-await c.query(`CREATE INDEX IF NOT EXISTS idx_applications_application_id ON applications (application_id)`);
-await c.query(`CREATE INDEX IF NOT EXISTS idx_applications_email ON applications (email)`);
-await c.query(`CREATE INDEX IF NOT EXISTS idx_applications_status ON applications (status)`);
-console.log('Indexes created!');
+    console.log('All tables created!');
+  } catch (e) {
+    console.error(e);
+  }
+};
 
-await c.query(`
-  CREATE OR REPLACE FUNCTION set_updated_at()
-  RETURNS TRIGGER AS $$
-  BEGIN
-    NEW.updated_at = NOW();
-    RETURN NEW;
-  END;
-  $$ LANGUAGE plpgsql
-`);
-await c.query(`DROP TRIGGER IF EXISTS applications_updated_at ON applications`);
-await c.query(`
-  CREATE TRIGGER applications_updated_at
-    BEFORE UPDATE ON applications
-    FOR EACH ROW EXECUTE FUNCTION set_updated_at()
-`);
-console.log('Trigger created!');
-
-await c.end();
+createTables();

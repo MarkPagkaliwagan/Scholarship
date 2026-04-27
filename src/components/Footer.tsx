@@ -4,9 +4,9 @@ import { GraduationCap, Mail, Phone, MapPin } from "lucide-react";
 const quickLinks = [
   { label: "Home",             href: "/" },
   { label: "About",            href: "/about" },
-  { label: "How to Apply",     href: "/apply" },
-  { label: "Track Application",href: "/track" },
-  { label: "Contact",          href: "/contact" },
+  { label: "How to Apply",     href: "/howtoapply" },
+  { label: "Track Application",href: "/tracking" },
+  { label: "Contact",          href: "/contacts" },
 ];
 
 export default function Footer() {
