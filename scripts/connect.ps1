@@ -4,7 +4,7 @@
 
 $TUNNEL_HOSTNAME = "scholarship-db.igat.com.ph"
 $LOCAL_PORT      = "5433"
-$CLOUDFLARED_EXE = "$PSScriptRoot\cloudflared.exe"
+$CLOUDFLARED_EXE = "C:\Program Files (x86)\cloudflared\cloudflared.exe"
 $DOWNLOAD_URL    = "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-amd64.exe"
 
 Write-Host ""
