@@ -5,6 +5,8 @@ import { Search, Loader2 } from "lucide-react";
 
 type ApplicationResult = {
   applicationId: string;
+  firstName: string;
+  lastName: string;
   status: string;
   remarks: string | null;
   submittedAt: string;
@@ -109,10 +111,10 @@ export default function TrackPage() {
                 style={{ background: "var(--cream)", border: "1px solid var(--sand)" }}>
                 <div>
                   <p className="font-display text-lg font-semibold" style={{ color: "var(--green-deep)" }}>
-                    SPC Economic Zone Scholarship
+                    {result.lastName}, {result.firstName}
                   </p>
                   <p className="font-body text-sm" style={{ color: "var(--muted)" }}>
-                    Submitted:{" "}
+                    {result.applicationId} · Submitted:{" "}
                     {new Date(result.submittedAt).toLocaleDateString("en-PH", { dateStyle: "long" })}
                   </p>
                   {result.remarks && (

@@ -13,6 +13,8 @@ export async function GET(req: NextRequest) {
   const [row] = await db
     .select({
       applicationId: applications.applicationId,
+      firstName: applications.firstName,
+      lastName: applications.lastName,
       status: applications.status,
       remarks: applications.remarks,
       submittedAt: applications.submittedAt,
