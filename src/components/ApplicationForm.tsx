@@ -151,7 +151,7 @@ export default function ApplicationForm() {
           <Badge className="w-8 h-8" style={{ color: "var(--green-bright)" }} />
         </div>
         <div className="space-y-2 mb-8 p-6 rounded-2xl text-left" style={{ background: "var(--parchment)" }}>
-          <p className="text-sm font-medium mb-3" style={{ color: "var(--green-deep)" }}>What's Next?</p>
+          <p className="text-sm font-medium mb-3" style={{ color: "var(--green-deep)" }}>What&apos;s Next?</p>
           <ul className="text-sm space-y-2" style={{ color: "var(--muted)" }}>
             <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4" style={{ color: "var(--green-bright)" }} /> Check your email for confirmation</li>
             <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4" style={{ color: "var(--green-bright)" }} /> Track status using your Application ID</li>

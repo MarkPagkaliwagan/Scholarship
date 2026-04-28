@@ -62,7 +62,7 @@ export default function AboutPage() {
         <div className="border-l-2 pl-8 py-2" style={{ borderColor: "var(--green-bright)" }}>
           <blockquote className="font-display text-3xl italic mb-3"
             style={{ color: "var(--green-deep)" }}>
-            "Education is the most powerful weapon which you can use to change the world."
+            &quot;Education is the most powerful weapon which you can use to change the world.&quot;
           </blockquote>
           <cite className="font-mono text-xs tracking-wider not-italic" style={{ color: "var(--muted)" }}>
             — City Government of San Pablo
