@@ -11,7 +11,7 @@ export default function ApplyPage() {
   return (
     <main
       className="min-h-screen"
-      style={{ background: "var(--cream)", fontFamily: "'DM Sans', sans-serif" }}
+      style={{ background: "#faf8f3", fontFamily: "'DM Sans', sans-serif" }}
     >
       <div className="pt-20" />
 

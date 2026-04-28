@@ -36,7 +36,7 @@ const documents = [
 
 export default function ApplyPage() {
   return (
-    <main className="min-h-screen pt-28 pb-24" style={{ background: "var(--cream)" }}>
+    <main className="min-h-screen pt-28 pb-24" style={{ background: "#faf8f3" }}>
       <div className="max-w-5xl mx-auto px-6">
 
         {/* Header */}

@@ -1,4 +1,5 @@
 import { Mail, Phone, MapPin, Clock } from "lucide-react";
+import MovingCircleBg from "@/components/MovingCircleBg";
 
 const info = [
   { icon: Mail, label: "Email", value: "scholarship@sanpablo.gov.ph" },
@@ -9,8 +10,9 @@ const info = [
 
 export default function ContactPage() {
   return (
-    <main className="min-h-screen pt-40 pb-24" style={{ background: "var(--cream)" }}>
-      <div className="max-w-5xl mx-auto px-6">
+    <main className="min-h-screen pt-40 pb-24 relative overflow-hidden" style={{ background: "#faf8f3" }}>
+      <MovingCircleBg />
+      <div className="max-w-5xl mx-auto px-6 relative z-10">
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
 

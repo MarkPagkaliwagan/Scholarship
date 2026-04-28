@@ -19,6 +19,7 @@ import {
   ArrowRight,
   ChevronRight,
 } from "lucide-react";
+import MovingCircleBg from "@/components/MovingCircleBg";
 
 // ─── Data ───────────────────────────────────────────────────────────────────
 
@@ -627,11 +628,8 @@ export default function HomePage() {
               backgroundSize: "32px 32px",
             }}
           />
-          {/* Decorative arc */}
-          <div
-            className="absolute top-0 right-0 w-[700px] h-[700px] rounded-full opacity-[0.06] pointer-events-none"
-            style={{ background: "#1a3c2e", transform: "translate(30%, -30%)" }}
-          />
+
+          <MovingCircleBg />
 
           <div className="relative z-10 max-w-6xl mx-auto px-6 w-full">
             <div className="max-w-3xl">

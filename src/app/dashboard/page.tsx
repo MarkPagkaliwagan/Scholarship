@@ -45,7 +45,7 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--cream)" }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#faf8f3" }}>
         <div className="animate-pulse flex flex-col items-center gap-4">
           <div className="w-12 h-12 rounded-full" style={{ background: "var(--green-deep)" }} />
           <p style={{ color: "var(--muted)" }}>Loading...</p>
@@ -55,7 +55,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen flex" style={{ background: "var(--cream)" }}>
+    <div className="min-h-screen flex" style={{ background: "#faf8f3" }}>
       <motion.aside
         initial={false}
         animate={{ width: sidebarOpen ? 260 : 72 }}
