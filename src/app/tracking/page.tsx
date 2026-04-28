@@ -58,7 +58,7 @@ export default function TrackPage() {
   const statusColor = result ? (STATUS_COLORS[result.status] ?? STATUS_COLORS.pending) : null;
 
   return (
-    <main className="min-h-screen pt-28 pb-24" style={{ background: "var(--cream)" }}>
+    <main className="min-h-screen pt-28 pb-24" style={{ background: "#faf8f3" }}>
       <div className="max-w-2xl mx-auto px-6">
 
         {/* Header */}
