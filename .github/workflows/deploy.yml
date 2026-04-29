@@ -1,4 +1,4 @@
-name: Deploy to igat
+name: Deploy to scholarship
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: [self-hosted, igat]
+    runs-on: [self-hosted, scholarship]
     steps:
       - name: Run deploy script
         run: ~/deploy.sh
