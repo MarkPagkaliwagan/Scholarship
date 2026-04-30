@@ -64,7 +64,7 @@ export default function ApplicationForm() {
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
-    mode: "onTouched",
+    mode: "onChange",
   });
 
   const nextStep = async () => {
@@ -413,7 +413,7 @@ export default function ApplicationForm() {
                           ? 'border-red-300 bg-red-50 focus:border-red-500' 
                           : 'border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30'
                       } focus:bg-white focus:outline-none`}
-                      style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundPosition: "right 1rem center", backgroundSize: "1.25rem" }}
+                      style={{ WebkitAppearance: "none", MozAppearance: "none", backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundPosition: "right 1rem center", backgroundSize: "1.25rem", backgroundRepeat: "no-repeat" }}
                     >
                       <option value="">Select year level...</option>
                       <option value="1">1st Year</option>
