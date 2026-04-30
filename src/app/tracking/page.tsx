@@ -58,44 +58,36 @@ export default function TrackPage() {
   const statusColor = result ? (STATUS_COLORS[result.status] ?? STATUS_COLORS.pending) : null;
 
   return (
-    <main className="min-h-screen pt-28 pb-24" style={{ background: "#faf8f3" }}>
-      <div className="max-w-2xl mx-auto px-6">
+    <main className="page-shell pt-32 pb-24">
+      <div className="narrow-container">
 
-        {/* Header */}
-        <div className="mb-16 text-center">
-          <p className="font-mono text-xs tracking-[0.3em] uppercase mb-4"
-            style={{ color: "var(--green-bright)" }}>Application Status</p>
-          <h1 className="h1 font-display text-5xl md:text-6xl font-bold mb-4"
-            style={{ color: "var(--green-deep)" }}>
+        <section className="mb-12 text-center section-divider pt-10">
+          <p className="eyebrow mb-4">Application Status</p>
+          <h1 className="page-title text-5xl md:text-6xl mb-5">
             Track Your Application
           </h1>
-          <p className="font-body text-base leading-relaxed" style={{ color: "var(--muted)" }}>
+          <p className="lead text-base">
             Enter your reference code to check your current application status.
           </p>
-        </div>
+        </section>
 
-        {/* Search box */}
-        <div className="p-10 rounded-2xl border mb-10"
-          style={{ background: "var(--parchment)", borderColor: "var(--sand)" }}>
+        <section className="surface p-6 md:p-8 mb-8">
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <label className="font-mono text-xs tracking-widest uppercase"
-              style={{ color: "var(--green-deep)" }}>
+            <label className="value-label" style={{ color: "var(--green-deep)" }}>
               Reference Code
             </label>
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               <input
                 type="text"
                 value={code}
                 onChange={e => setCode(e.target.value)}
                 placeholder="e.g. SPC-AB12CD"
-                className="flex-1 px-4 py-3 rounded-xl border text-sm font-body bg-white outline-none focus:ring-2 transition"
-                style={{ borderColor: "var(--sand)", color: "var(--ink)" }}
+                className="field-control flex-1 px-4 py-3 text-sm font-body"
               />
               <button
                 type="submit"
                 disabled={loading || !code.trim()}
-                className="px-6 py-3 rounded-xl text-sm font-medium font-body flex items-center gap-2 transition hover:opacity-90 disabled:opacity-60"
-                style={{ background: "var(--green-deep)", color: "var(--cream)" }}
+                className="btn-primary px-6 py-3 text-sm font-body disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
                 Search
@@ -105,9 +97,8 @@ export default function TrackPage() {
 
           {result && (
             <div className="mt-8 pt-8 border-t" style={{ borderColor: "var(--sand)" }}>
-              <p className="font-mono text-xs tracking-widest uppercase mb-4"
-                style={{ color: "var(--muted)" }}>Result for &ldquo;{result.applicationId}&rdquo;</p>
-              <div className="flex items-center justify-between p-4 rounded-xl"
+              <p className="value-label mb-4">Result for &ldquo;{result.applicationId}&rdquo;</p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-lg"
                 style={{ background: "var(--cream)", border: "1px solid var(--sand)" }}>
                 <div>
                   <p className="font-display text-lg font-semibold" style={{ color: "var(--green-deep)" }}>
@@ -124,7 +115,7 @@ export default function TrackPage() {
                   )}
                 </div>
                 {statusColor && (
-                  <span className="px-4 py-1.5 rounded-full text-xs font-mono font-medium"
+                  <span className="self-start px-4 py-1.5 rounded-full text-xs font-mono font-medium"
                     style={{ background: statusColor.bg, color: statusColor.text }}>
                     {STATUS_LABELS[result.status] ?? result.status.toUpperCase()}
                   </span>
@@ -138,9 +129,8 @@ export default function TrackPage() {
               No application found for &ldquo;{code}&rdquo;. Please check your reference code.
             </p>
           )}
-        </div>
+        </section>
 
-        {/* Info note */}
         <p className="font-mono text-xs text-center tracking-wider" style={{ color: "var(--muted)" }}>
           Reference codes follow the format SPC-XXXXXX. Check your email for your code.
         </p>

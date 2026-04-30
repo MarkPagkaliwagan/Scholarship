@@ -44,7 +44,7 @@ export default function Sidebar({ menuOpen, setMenuOpen, navLinks, pathname, use
   // Mobile Bottom Navigation (Dashboard only, ≤640px)
   if (isMobile && isDashboard) {
     return (
-      <nav className="fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl border-t border-white/10 lg:hidden" style={{ background: "#0d1117", paddingBottom: "env(safe-area-inset-bottom)" }}>
+      <nav className="fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl border-t lg:hidden" style={{ background: "rgba(255,253,248,0.96)", borderColor: "var(--sand-soft)", paddingBottom: "env(safe-area-inset-bottom)" }}>
         <div className="flex items-center justify-around px-4 py-2">
           {menuItems.map((item) => {
             const isActive = pathname === item.href;
@@ -54,12 +54,12 @@ export default function Sidebar({ menuOpen, setMenuOpen, navLinks, pathname, use
                 key={item.href}
                 href={item.href}
                 className="flex flex-col items-center gap-1 px-3 py-2 rounded-lg relative"
-                style={{ color: isActive ? "#10b981" : "rgba(255,255,255,0.6)" }}
+                style={{ color: isActive ? "var(--green-deep)" : "var(--muted)" }}
               >
                 {isActive && (
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full bg-gradient-to-r from-green-400 to-blue-500" />
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full" style={{ background: "var(--green-bright)" }} />
                 )}
-                {Icon && <Icon className={`w-5 h-5 ${isActive ? "drop-shadow-[0_0_8px_rgba(16,185,129,0.6)]" : ""}`} />}
+                {Icon && <Icon className="w-5 h-5" />}
                 <span className="text-xs font-medium">{item.label}</span>
               </Link>
             );
@@ -84,47 +84,43 @@ export default function Sidebar({ menuOpen, setMenuOpen, navLinks, pathname, use
         onClick={() => setMenuOpen(false)}
       />
       <div
-        className="fixed top-0 right-0 z-50 h-full w-64 shadow-2xl transform transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+        className="fixed top-0 right-0 z-50 h-full w-64 shadow-2xl transform transition-all duration-300 [transition-timing-function:cubic-bezier(0.32,0.72,0,1)]"
         style={{
-          background: "#0d1117",
-          borderLeft: "1px solid rgba(255,255,255,0.08)",
+          background: "var(--paper)",
+          borderLeft: "1px solid var(--sand-soft)",
           transform: menuOpen ? "translateX(0)" : "translateX(100%)",
           opacity: menuOpen ? 1 : 0,
         }}
       >
-        {/* Header with pulse dot */}
-        <div className="flex items-center justify-between p-6 border-b border-white/5">
+        <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: "var(--sand-soft)" }}>
           <div className="flex items-center gap-2">
-            <div className="relative">
-              <div className="w-2 h-2 rounded-full bg-green-400" />
-              <div className="absolute inset-0 w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "var(--green-deep)" }}>
+              <Home className="w-4 h-4" style={{ color: "var(--cream)" }} />
             </div>
-            <span className="font-mono text-[10px] font-medium text-green-400 tracking-wider">SYSTEM ONLINE</span>
+            <span className="font-display text-base font-bold" style={{ color: "var(--green-deep)" }}>Scholarship Office</span>
           </div>
           <button onClick={() => setMenuOpen(false)} className="opacity-50 hover:opacity-100 transition-opacity">
-            <X className="w-5 h-5 text-gray-400" />
+            <X className="w-5 h-5" style={{ color: "var(--green-deep)" }} />
           </button>
         </div>
 
-        {/* User Card */}
         {user && (
-          <div className="p-6 border-b border-white/5">
+          <div className="p-6 border-b" style={{ borderColor: "var(--sand-soft)" }}>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center text-white font-bold text-sm">
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm" style={{ background: "var(--green-deep)" }}>
                 {getInitials(user.name)}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white truncate">{user.name}</p>
-                <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                <p className="text-sm font-medium truncate" style={{ color: "var(--green-deep)" }}>{user.name}</p>
+                <p className="text-xs truncate" style={{ color: "var(--muted)" }}>{user.email}</p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Navigation */}
         <nav className="flex-1 overflow-y-auto py-4">
           <div className="px-6 mb-2">
-            <span className="text-[10px] font-bold text-gray-500 tracking-[0.2em]">PAGES</span>
+            <span className="value-label">Pages</span>
           </div>
           {menuItems.map((item) => {
             const isActive = pathname === item.href;
@@ -134,22 +130,19 @@ export default function Sidebar({ menuOpen, setMenuOpen, navLinks, pathname, use
                 key={item.href}
                 href={item.href}
                 className="group relative flex items-center gap-3 px-6 py-3 transition-all duration-200"
-                style={{ color: isActive ? "white" : "rgba(255,255,255,0.6)" }}
+                style={{ color: isActive ? "var(--green-deep)" : "var(--muted)" }}
                 onClick={() => setMenuOpen(false)}
               >
-                {/* Active indicator */}
                 {isActive && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-r-full bg-gradient-to-b from-green-400 to-blue-500 shadow-[0_0_12px_rgba(16,185,129,0.6)]" />
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-r-full" style={{ background: "var(--green-bright)" }} />
                 )}
 
-                {/* Hover gradient wash */}
-                <div className="absolute inset-0 bg-gradient-to-r from-green-400/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                <div className="absolute inset-x-3 inset-y-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200" style={{ background: "rgba(45,106,79,0.07)" }} />
 
                 {Icon && <Icon className="w-5 h-5 relative z-10" />}
                 <span className="text-sm font-medium relative z-10">{item.label}</span>
 
-                {/* Chevron on hover */}
-                <ChevronRight className="w-4 h-4 ml-auto opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 text-green-400" />
+                <ChevronRight className="w-4 h-4 ml-auto opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 relative z-10" style={{ color: "var(--green-bright)" }} />
               </Link>
             );
           })}
@@ -157,7 +150,7 @@ export default function Sidebar({ menuOpen, setMenuOpen, navLinks, pathname, use
           {isDashboard && (
             <>
               <div className="px-6 mt-6 mb-2">
-                <span className="text-[10px] font-bold text-gray-500 tracking-[0.2em]">ACCOUNT</span>
+                <span className="value-label">Account</span>
               </div>
 
               <button
@@ -165,7 +158,7 @@ export default function Sidebar({ menuOpen, setMenuOpen, navLinks, pathname, use
                   handleSignOut();
                   setMenuOpen(false);
                 }}
-                className="group relative flex items-center gap-3 px-6 py-3 w-full transition-all duration-200 text-red-400 hover:bg-red-500/10"
+                className="group relative flex items-center gap-3 px-6 py-3 w-full transition-all duration-200 text-red-600 hover:bg-red-50"
               >
                 <LogOut className="w-5 h-5" />
                 <span className="text-sm font-medium">Sign Out</span>

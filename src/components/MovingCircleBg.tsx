@@ -4,72 +4,36 @@ export default function MovingCircleBg() {
   return (
     <>
       <style jsx>{`
-        @keyframes float-slow {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          33% { transform: translate(60px, -50px) scale(1.08); }
-          66% { transform: translate(-40px, 40px) scale(0.92); }
+        @keyframes drift-lines {
+          0%, 100% { transform: translate3d(0, 0, 0); }
+          50% { transform: translate3d(-18px, 12px, 0); }
         }
-        @keyframes float-medium {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          25% { transform: translate(-70px, 40px) scale(1.15); }
-          50% { transform: translate(40px, -70px) scale(0.85); }
-          75% { transform: translate(60px, 60px) scale(1.1); }
-        }
-        @keyframes float-fast {
-          0%, 100% { transform: translate(0, 0) rotate(0deg); }
-          25% { transform: translate(80px, -80px) rotate(90deg); }
-          50% { transform: translate(-50px, 50px) rotate(180deg); }
-          75% { transform: translate(70px, 70px) rotate(270deg); }
-        }
-        .animate-float-slow {
-          animation: float-slow 18s ease-in-out infinite;
-        }
-        .animate-float-medium {
-          animation: float-medium 12s ease-in-out infinite;
-        }
-        .animate-float-fast {
-          animation: float-fast 8s ease-in-out infinite;
+        .civic-bg-lines {
+          animation: drift-lines 18s ease-in-out infinite;
         }
       `}</style>
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
         <div
-          className="absolute rounded-full opacity-[0.07] animate-float-slow"
+          className="absolute inset-0 opacity-[0.28]"
           style={{
-            width: "500px",
-            height: "500px",
-            background: "#1a3c2e",
-            top: "10%",
-            left: "60%",
+            backgroundImage:
+              "linear-gradient(115deg, transparent 0 44%, rgba(45,106,79,0.10) 44% 45%, transparent 45% 100%), linear-gradient(0deg, rgba(212,201,176,0.22) 1px, transparent 1px)",
+            backgroundSize: "220px 220px, 100% 56px",
           }}
         />
         <div
-          className="absolute rounded-full opacity-[0.05] animate-float-medium"
+          className="civic-bg-lines absolute -inset-10 opacity-[0.16]"
           style={{
-            width: "700px",
-            height: "700px",
-            background: "#2d6a4f",
-            top: "50%",
-            left: "-20%",
+            backgroundImage:
+              "repeating-linear-gradient(135deg, transparent 0 46px, rgba(26,60,46,0.26) 47px, transparent 48px)",
           }}
         />
         <div
-          className="absolute rounded-full opacity-[0.06] animate-float-fast"
+          className="absolute right-[-8rem] top-24 h-[32rem] w-[32rem] opacity-[0.06]"
           style={{
-            width: "400px",
-            height: "400px",
-            background: "#40916c",
-            top: "70%",
-            right: "10%",
-          }}
-        />
-        <div
-          className="absolute rounded-full opacity-[0.04] animate-float-slow"
-          style={{
-            width: "600px",
-            height: "600px",
-            background: "#52b788",
-            top: "20%",
-            right: "-15%",
+            background:
+              "conic-gradient(from 90deg, transparent, rgba(26,60,46,0.45), transparent 35%, rgba(26,60,46,0.35), transparent 70%)",
+            clipPath: "polygon(0 0, 100% 0, 74% 100%, 0 72%)",
           }}
         />
       </div>

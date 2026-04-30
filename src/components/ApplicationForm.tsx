@@ -127,30 +127,29 @@ export default function ApplicationForm() {
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-2xl mx-auto p-8 md:p-12 text-center bg-white rounded-3xl shadow-sm border"
-        style={{ borderColor: "var(--sand)" }}
+        className="surface w-full max-w-2xl mx-auto p-8 md:p-12 text-center"
       >
-        <div className="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center" style={{ background: "var(--green-deep)", color: "white" }}>
+        <div className="w-20 h-20 rounded-lg mx-auto mb-6 flex items-center justify-center" style={{ background: "var(--green-deep)", color: "white" }}>
           <CheckCircle2 className="w-10 h-10" />
         </div>
-        <p className="text-[10px] tracking-[0.2em] uppercase mb-3" style={{ color: "var(--green-bright)" }}>
+        <p className="eyebrow mb-3">
           Application Received
         </p>
-        <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: "var(--green-deep)" }}>
+        <h2 className="font-display text-3xl md:text-4xl font-bold mb-4" style={{ color: "var(--green-deep)" }}>
           Thank You!
         </h2>
-        <p className="text-base mb-8 max-w-md mx-auto" style={{ color: "var(--muted)" }}>
+        <p className="lead text-base mb-8 max-w-md mx-auto">
           Your application has been submitted. Our scholarship committee will review your documents and get back to you within 2-4 weeks.
         </p>
-        <div className="inline-flex items-center gap-4 px-8 py-4 rounded-2xl mb-8" style={{ background: "var(--cream)" }}>
+        <div className="inline-flex items-center gap-4 px-8 py-4 rounded-lg mb-8" style={{ background: "var(--cream)" }}>
           <div className="text-left">
-            <p className="text-[10px] tracking-widest uppercase mb-1" style={{ color: "var(--green-mid)" }}>Application ID</p>
+            <p className="value-label mb-1" style={{ color: "var(--green-mid)" }}>Application ID</p>
             <p className="text-2xl font-bold" style={{ color: "var(--green-deep)" }}>{applicationId}</p>
           </div>
           <div className="w-px h-12" style={{ background: "var(--sand)" }} />
           <Badge className="w-8 h-8" style={{ color: "var(--green-bright)" }} />
         </div>
-        <div className="space-y-2 mb-8 p-6 rounded-2xl text-left" style={{ background: "var(--parchment)" }}>
+        <div className="space-y-2 mb-8 p-6 rounded-lg text-left" style={{ background: "var(--parchment)" }}>
           <p className="text-sm font-medium mb-3" style={{ color: "var(--green-deep)" }}>What&apos;s Next?</p>
           <ul className="text-sm space-y-2" style={{ color: "var(--muted)" }}>
             <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4" style={{ color: "var(--green-bright)" }} /> Check your email for confirmation</li>
@@ -159,10 +158,10 @@ export default function ApplicationForm() {
           </ul>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Link href="/" className="px-8 py-3 rounded-full font-medium transition-all hover:opacity-90" style={{ background: "var(--green-deep)", color: "white" }}>
+          <Link href="/" className="btn-primary px-8 py-3 font-medium">
             Return to Homepage
           </Link>
-          <Link href="/howtoapply" className="px-8 py-3 rounded-full font-medium border-2 transition-all hover:bg-gray-50" style={{ borderColor: "var(--green-deep)", color: "var(--green-deep)" }}>
+          <Link href="/howtoapply" className="btn-secondary px-8 py-3 font-medium">
             View Application Guide
           </Link>
         </div>
@@ -185,14 +184,14 @@ export default function ApplicationForm() {
                 key={step.id}
                 onClick={() => index < currentStep && setCurrentStep(index)}
                 disabled={index > currentStep}
-                className="flex-1 flex flex-col items-center gap-2 py-3 px-1 rounded-xl transition-all"
+                className="flex-1 flex flex-col items-center gap-2 py-3 px-1 rounded-lg transition-all"
                 style={{
                   background: isCurrent ? "rgba(45, 106, 79, 0.08)" : "transparent",
                   cursor: index > currentStep ? "default" : "pointer",
                 }}
               >
                 <div 
-                  className="w-10 h-10 rounded-full flex items-center justify-center transition-all"
+                  className="w-10 h-10 rounded-lg flex items-center justify-center transition-all"
                   style={{
                     background: isCompleted || isCurrent ? "var(--green-deep)" : "#f3f4f6",
                     color: isCompleted || isCurrent ? "white" : "#9ca3af",
@@ -223,8 +222,7 @@ export default function ApplicationForm() {
       </div>
 
       <motion.div 
-        className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border"
-        style={{ borderColor: "var(--sand)" }}
+        className="surface p-6 md:p-8"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
@@ -248,7 +246,7 @@ export default function ApplicationForm() {
                       id="firstName" 
                       {...register("firstName")} 
                       placeholder="Enter your first name"
-                      className={`w-full px-4 py-3.5 rounded-xl border-2 transition-all ${
+                      className={`w-full px-4 py-3.5 rounded-lg border-2 transition-all ${
                         errors.firstName 
                           ? 'border-red-300 bg-red-50 focus:border-red-500' 
                           : 'border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30'
@@ -268,7 +266,7 @@ export default function ApplicationForm() {
                       id="lastName" 
                       {...register("lastName")} 
                       placeholder="Enter your last name"
-                      className={`w-full px-4 py-3.5 rounded-xl border-2 transition-all ${
+                      className={`w-full px-4 py-3.5 rounded-lg border-2 transition-all ${
                         errors.lastName 
                           ? 'border-red-300 bg-red-50 focus:border-red-500' 
                           : 'border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30'
@@ -292,7 +290,7 @@ export default function ApplicationForm() {
                       type="email" 
                       {...register("email")} 
                       placeholder="your.email@example.com"
-                      className={`w-full px-4 py-3.5 rounded-xl border-2 transition-all ${
+                      className={`w-full px-4 py-3.5 rounded-lg border-2 transition-all ${
                         errors.email 
                           ? 'border-red-300 bg-red-50 focus:border-red-500' 
                           : 'border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30'
@@ -313,7 +311,7 @@ export default function ApplicationForm() {
                       type="tel" 
                       placeholder="09XX XXX XXXX"
                       {...register("phone")} 
-                      className={`w-full px-4 py-3.5 rounded-xl border-2 transition-all ${
+                      className={`w-full px-4 py-3.5 rounded-lg border-2 transition-all ${
                         errors.phone 
                           ? 'border-red-300 bg-red-50 focus:border-red-500' 
                           : 'border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30'
@@ -336,7 +334,7 @@ export default function ApplicationForm() {
                     rows={3} 
                     {...register("address")} 
                     placeholder="House No., Street, Barangay, City"
-                    className={`w-full px-4 py-3.5 rounded-xl border-2 transition-all resize-none ${
+                    className={`w-full px-4 py-3.5 rounded-lg border-2 transition-all resize-none ${
                       errors.address 
                         ? 'border-red-300 bg-red-50 focus:border-red-500' 
                         : 'border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30'
@@ -367,7 +365,7 @@ export default function ApplicationForm() {
                     id="schoolName" 
                     {...register("schoolName")} 
                     placeholder="e.g., Laguna State Polytechnic University"
-                    className={`w-full px-4 py-3.5 rounded-xl border-2 transition-all ${
+                    className={`w-full px-4 py-3.5 rounded-lg border-2 transition-all ${
                       errors.schoolName 
                         ? 'border-red-300 bg-red-50 focus:border-red-500' 
                         : 'border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30'
@@ -389,7 +387,7 @@ export default function ApplicationForm() {
                       id="course" 
                       {...register("course")} 
                       placeholder="e.g., Bachelor of Science in Information Technology"
-                      className={`w-full px-4 py-3.5 rounded-xl border-2 transition-all ${
+                      className={`w-full px-4 py-3.5 rounded-lg border-2 transition-all ${
                         errors.course 
                           ? 'border-red-300 bg-red-50 focus:border-red-500' 
                           : 'border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30'
@@ -408,7 +406,7 @@ export default function ApplicationForm() {
                     <select 
                       id="yearLevel" 
                       {...register("yearLevel")} 
-                      className={`w-full px-4 py-3.5 rounded-xl border-2 transition-all appearance-none ${
+                      className={`w-full px-4 py-3.5 rounded-lg border-2 transition-all appearance-none ${
                         errors.yearLevel 
                           ? 'border-red-300 bg-red-50 focus:border-red-500' 
                           : 'border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30'
@@ -438,7 +436,7 @@ export default function ApplicationForm() {
                     id="gwa" 
                     placeholder="e.g., 1.50 or 92"
                     {...register("gwa")} 
-                    className={`w-full md:w-1/2 px-4 py-3.5 rounded-xl border-2 transition-all ${
+                    className={`w-full md:w-1/2 px-4 py-3.5 rounded-lg border-2 transition-all ${
                       errors.gwa 
                         ? 'border-red-300 bg-red-50 focus:border-red-500' 
                         : 'border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30'
@@ -471,12 +469,12 @@ export default function ApplicationForm() {
                   ].map((doc, idx) => (
                     <div 
                       key={idx} 
-                      className="border-2 border-dashed rounded-2xl p-5 flex flex-col md:flex-row items-center justify-between gap-4 transition-all hover:border-[var(--green-bright)] cursor-pointer"
+                      className="border-2 border-dashed rounded-lg p-5 flex flex-col md:flex-row items-center justify-between gap-4 transition-all hover:border-[var(--green-bright)] cursor-pointer"
                       style={{ borderColor: "var(--sand)", background: "var(--cream)" }}
                     >
                       <div className="flex items-center gap-4">
                         <div 
-                          className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                          className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
                           style={{ background: "var(--green-deep)", color: "white" }}
                         >
                           <FileText className="w-5 h-5" />
@@ -489,7 +487,7 @@ export default function ApplicationForm() {
                         </div>
                       </div>
                       <div 
-                        className="px-5 py-2.5 rounded-xl font-medium text-sm flex items-center gap-2 transition-all hover:opacity-80"
+                        className="px-5 py-2.5 rounded-lg font-medium text-sm flex items-center gap-2 transition-all hover:opacity-80"
                         style={{ background: "var(--green-deep)", color: "white" }}
                       >
                         <UploadCloud className="w-4 h-4" /> Upload
@@ -498,7 +496,7 @@ export default function ApplicationForm() {
                   ))}
                 </div>
                 <div 
-                  className="mt-5 p-4 rounded-xl flex items-center gap-3"
+                  className="mt-5 p-4 rounded-lg flex items-center gap-3"
                   style={{ background: "var(--parchment)" }}
                 >
                   <AlertCircle className="w-4 h-4 flex-shrink-0" style={{ color: "var(--green-bright)" }} />
@@ -518,7 +516,7 @@ export default function ApplicationForm() {
                 transition={{ duration: 0.3 }}
               >
                 <div 
-                  className="p-5 rounded-2xl mb-6 flex items-start gap-4"
+                  className="p-5 rounded-lg mb-6 flex items-start gap-4"
                   style={{ background: "rgba(45, 106, 79, 0.06)", border: "1px solid rgba(45, 106, 79, 0.1)" }}
                 >
                   <Shield className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: "var(--green-mid)" }} />
@@ -539,7 +537,7 @@ export default function ApplicationForm() {
                       value={accountUsername}
                       onChange={(e) => { setAccountUsername(e.target.value); setAccountError(null); }}
                       placeholder="Choose a username"
-                      className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30 focus:bg-white focus:outline-none transition-all"
+                      className="w-full px-4 py-3.5 rounded-lg border-2 border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30 focus:bg-white focus:outline-none transition-all"
                     />
                   </div>
                   <div className="space-y-2">
@@ -552,7 +550,7 @@ export default function ApplicationForm() {
                         value={accountPassword}
                         readOnly
                         placeholder="Click Generate Password"
-                        className="flex-1 px-4 py-3.5 rounded-xl border-2 border-gray-100 bg-gray-50/30 focus:outline-none"
+                        className="flex-1 px-4 py-3.5 rounded-lg border-2 border-gray-100 bg-gray-50/30 focus:outline-none"
                         style={{ color: accountPassword ? "var(--green-deep)" : "var(--muted)" }}
                       />
                       <button
@@ -562,7 +560,7 @@ export default function ApplicationForm() {
                           setAccountPassword(pwd);
                           setAccountError(null);
                         }}
-                        className="px-4 py-3 rounded-xl font-medium transition-all"
+                        className="px-4 py-3 rounded-lg font-medium transition-all"
                         style={{ background: "var(--green-deep)", color: "white" }}
                       >
                         Generate
@@ -575,7 +573,7 @@ export default function ApplicationForm() {
                             setCopied(true);
                             setTimeout(() => setCopied(false), 2000);
                           }}
-                          className="px-4 py-3 rounded-xl font-medium transition-all"
+                          className="px-4 py-3 rounded-lg font-medium transition-all"
                           style={{ background: "var(--cream)", color: "var(--green-deep)" }}
                         >
                           {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
@@ -601,7 +599,7 @@ export default function ApplicationForm() {
                 transition={{ duration: 0.3 }}
               >
                 <div 
-                  className="rounded-2xl p-6 md:p-8 space-y-6"
+                  className="rounded-lg p-6 md:p-8 space-y-6"
                   style={{ background: "var(--cream)", border: "1px solid var(--sand)" }}
                 >
                   <div>
@@ -612,21 +610,21 @@ export default function ApplicationForm() {
                       </h3>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                      <div className="p-4 rounded-xl bg-white border" style={{ borderColor: "var(--sand)" }}>
+                      <div className="p-4 rounded-lg bg-white border" style={{ borderColor: "var(--sand)" }}>
                         <p className="text-xs mb-1" style={{ color: "var(--muted)" }}>Full Name</p>
                         <p className="font-medium" style={{ color: "var(--green-deep)" }}>
                           {getValues("firstName")} {getValues("lastName")}
                         </p>
                       </div>
-                      <div className="p-4 rounded-xl bg-white border" style={{ borderColor: "var(--sand)" }}>
+                      <div className="p-4 rounded-lg bg-white border" style={{ borderColor: "var(--sand)" }}>
                         <p className="text-xs mb-1" style={{ color: "var(--muted)" }}>Email Address</p>
                         <p className="font-medium" style={{ color: "var(--green-deep)" }}>{getValues("email") || "—"}</p>
                       </div>
-                      <div className="p-4 rounded-xl bg-white border" style={{ borderColor: "var(--sand)" }}>
+                      <div className="p-4 rounded-lg bg-white border" style={{ borderColor: "var(--sand)" }}>
                         <p className="text-xs mb-1" style={{ color: "var(--muted)" }}>Mobile Number</p>
                         <p className="font-medium" style={{ color: "var(--green-deep)" }}>{getValues("phone") || "—"}</p>
                       </div>
-                      <div className="p-4 rounded-xl bg-white border sm:col-span-2" style={{ borderColor: "var(--sand)" }}>
+                      <div className="p-4 rounded-lg bg-white border sm:col-span-2" style={{ borderColor: "var(--sand)" }}>
                         <p className="text-xs mb-1" style={{ color: "var(--muted)" }}>Address</p>
                         <p className="font-medium" style={{ color: "var(--green-deep)" }}>{getValues("address") || "—"}</p>
                       </div>
@@ -641,21 +639,21 @@ export default function ApplicationForm() {
                       </h3>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                      <div className="p-4 rounded-xl bg-white border sm:col-span-2" style={{ borderColor: "var(--sand)" }}>
+                      <div className="p-4 rounded-lg bg-white border sm:col-span-2" style={{ borderColor: "var(--sand)" }}>
                         <p className="text-xs mb-1" style={{ color: "var(--muted)" }}>School / University</p>
                         <p className="font-medium" style={{ color: "var(--green-deep)" }}>{getValues("schoolName") || "—"}</p>
                       </div>
-                      <div className="p-4 rounded-xl bg-white border" style={{ borderColor: "var(--sand)" }}>
+                      <div className="p-4 rounded-lg bg-white border" style={{ borderColor: "var(--sand)" }}>
                         <p className="text-xs mb-1" style={{ color: "var(--muted)" }}>Course / Program</p>
                         <p className="font-medium" style={{ color: "var(--green-deep)" }}>{getValues("course") || "—"}</p>
                       </div>
-                      <div className="p-4 rounded-xl bg-white border" style={{ borderColor: "var(--sand)" }}>
+                      <div className="p-4 rounded-lg bg-white border" style={{ borderColor: "var(--sand)" }}>
                         <p className="text-xs mb-1" style={{ color: "var(--muted)" }}>Year Level</p>
                         <p className="font-medium" style={{ color: "var(--green-deep)" }}>
                           {getValues("yearLevel") ? `${getValues("yearLevel")}${getValues("yearLevel") === "1" ? "st" : getValues("yearLevel") === "2" ? "nd" : getValues("yearLevel") === "3" ? "rd" : "th"} Year` : "—"}
                         </p>
                       </div>
-                      <div className="p-4 rounded-xl bg-white border" style={{ borderColor: "var(--sand)" }}>
+                      <div className="p-4 rounded-lg bg-white border" style={{ borderColor: "var(--sand)" }}>
                         <p className="text-xs mb-1" style={{ color: "var(--muted)" }}>GWA</p>
                         <p className="font-medium" style={{ color: "var(--green-deep)" }}>{getValues("gwa") || "—"}</p>
                       </div>
@@ -663,7 +661,7 @@ export default function ApplicationForm() {
                   </div>
                 </div>
 
-                <div className="mt-6 flex items-start gap-4 p-5 rounded-xl" style={{ background: "var(--parchment)", border: "1px solid rgba(45, 106, 79, 0.1)" }}>
+                <div className="mt-6 flex items-start gap-4 p-5 rounded-lg" style={{ background: "var(--parchment)", border: "1px solid rgba(45, 106, 79, 0.1)" }}>
                   <input 
                     type="checkbox" 
                     id="terms" 
@@ -685,7 +683,7 @@ export default function ApplicationForm() {
             <button
               type="button"
               onClick={prevStep}
-              className="px-6 py-3 rounded-full font-medium transition-all flex items-center gap-2"
+              className="px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2"
               style={{
                 background: currentStep === 0 ? "transparent" : "#f9fafb",
                 color: currentStep === 0 ? "transparent" : "var(--green-deep)",
@@ -700,7 +698,7 @@ export default function ApplicationForm() {
               <button
                 type="button"
                 onClick={nextStep}
-                className="px-8 py-3 rounded-full font-medium transition-all flex items-center gap-2 hover:opacity-90 shadow-md"
+                className="btn-primary px-8 py-3 font-medium"
                 style={{ background: "var(--green-deep)", color: "white" }}
               >
                 Continue <ChevronRight className="w-4 h-4" />
@@ -709,8 +707,8 @@ export default function ApplicationForm() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-10 py-3 rounded-full font-medium transition-all flex items-center gap-2 hover:opacity-90 disabled:opacity-70 shadow-md"
-                style={{ background: "#f97316", color: "white" }}
+                className="px-10 py-3 rounded-lg font-medium transition-all flex items-center gap-2 hover:opacity-90 disabled:opacity-70 shadow-md"
+                style={{ background: "#b45309", color: "white" }}
               >
                 {isSubmitting ? (
                   <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>

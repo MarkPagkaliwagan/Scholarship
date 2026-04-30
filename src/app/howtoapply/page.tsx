@@ -36,37 +36,23 @@ const documents = [
 
 export default function ApplyPage() {
   return (
-    <main className="min-h-screen pt-28 pb-24" style={{ background: "#faf8f3" }}>
-      <div className="max-w-5xl mx-auto px-6">
-
-        {/* Header */}
-        <div className="mb-20">
-          <p
-            className="font-mono text-xs tracking-[0.3em] uppercase mb-4"
-            style={{ color: "var(--green-bright)" }}
-          >
-            Application Guide
-          </p>
-          <h1
-            className="h1 font-display text-6xl md:text-7xl font-bold leading-tight mb-6"
-            style={{ color: "var(--green-deep)" }}
-          >
-            How to Apply<br />
+    <main className="page-shell pt-32 pb-24">
+      <div className="page-container">
+        <section className="mb-16 max-w-3xl section-divider pt-10">
+          <p className="eyebrow mb-4">Application Guide</p>
+          <h1 className="page-title text-5xl md:text-7xl mb-7">
+            How to apply
           </h1>
-          <p
-            className="font-body text-lg max-w-xl leading-relaxed"
-            style={{ color: "var(--muted)" }}
-          >
+          <p className="lead text-lg max-w-xl">
             Follow these simple steps to complete your scholarship application for Iskolar ng San Pablo.
           </p>
-        </div>
+        </section>
 
-        {/* Steps */}
-        <div className="mb-24 space-y-0">
+        <section className="mb-20 space-y-0">
           {steps.map((s, i) => (
             <div
               key={s.step}
-              className="flex gap-8 pb-12 relative"
+              className="relative pb-12"
               style={{
                 borderLeft: i < steps.length - 1 ? `1px solid var(--sand)` : "none",
                 marginLeft: "20px",
@@ -75,7 +61,7 @@ export default function ApplyPage() {
             >
               {/* Dot */}
               <div
-                className="absolute -left-[9px] top-0 w-4 h-4 rounded-full border-2"
+                className="absolute -left-[9px] top-1 w-4 h-4 rounded-full border-2"
                 style={{
                   background: "var(--green-bright)",
                   borderColor: "var(--green-deep)",
@@ -83,15 +69,12 @@ export default function ApplyPage() {
               />
 
               <div className="flex-1">
-                <span
-                  className="font-mono text-xs tracking-widest"
-                  style={{ color: "var(--green-light)" }}
-                >
+                <span className="eyebrow" style={{ color: "var(--green-bright)" }}>
                   {s.step}
                 </span>
 
                 <h2
-                  className="font-display text-2xl font-semibold mt-1 mb-2"
+                  className="font-display text-3xl font-semibold mt-2 mb-3"
                   style={{ color: "var(--green-deep)" }}
                 >
                   {s.title}
@@ -99,7 +82,7 @@ export default function ApplyPage() {
 
                 {/* Changed from <p> to <div> to support lists */}
                 <div
-                  className="font-body text-sm leading-relaxed"
+                  className="lead text-sm"
                   style={{ color: "var(--muted)" }}
                 >
                   {s.body}
@@ -107,13 +90,9 @@ export default function ApplyPage() {
               </div>
             </div>
           ))}
-        </div>
+        </section>
 
-        {/* Documents */}
-        <div
-          className="p-10 rounded-2xl border mb-16"
-          style={{ background: "var(--parchment)", borderColor: "var(--sand)" }}
-        >
+        <section className="surface-muted p-8 md:p-10 mb-14">
           <h2
             className="font-display text-2xl font-bold mb-6"
             style={{ color: "var(--green-deep)" }}
@@ -129,7 +108,7 @@ export default function ApplyPage() {
                   style={{ background: "var(--green-bright)" }}
                 />
                 <span
-                  className="font-body text-sm"
+                  className="font-body text-sm leading-relaxed"
                   style={{ color: "var(--muted)" }}
                 >
                   {doc}
@@ -137,16 +116,14 @@ export default function ApplyPage() {
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
-        {/* CTA */}
         <div className="text-center">
           <Link
-            href="/contact"
-            className="px-10 py-4 rounded-full text-sm font-medium font-body transition-all hover:opacity-90"
-            style={{ background: "var(--green-deep)", color: "var(--cream)" }}
+            href="/contacts"
+            className="btn-primary px-10 py-4 text-sm font-body"
           >
-            Contact Us for More Info →
+            Contact Us for More Info
           </Link>
         </div>
 

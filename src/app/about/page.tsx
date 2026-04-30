@@ -1,74 +1,64 @@
 const pillars = [
   {
     number: "01",
-    title: "Our Mission",
+    title: "Mission",
     body: (
-      <ul className="list-disc pl-5 space-y-1">
-        <li>Transparent and accountable governance</li>
-        <li>Sustainable environmental protection</li>
-        <li>Inclusive economic development</li>
+      <ul className="space-y-2 text-sm leading-relaxed" style={{ color: "var(--muted)" }}>
+        <li>Support qualified San Pablo students through clear scholarship access.</li>
+        <li>Keep application review transparent, fair, and accountable.</li>
+        <li>Help families stay informed from application to award release.</li>
       </ul>
     ),
   },
   {
     number: "02",
-    title: "Our Vision",
-    body: "Sed euismod, nisl vel ultricies lacinia, nisl nisl aliquam nisl, nec aliquam nisl nisl sit amet nisl. Quisque vehicula magna at libero tincidunt dignissim.",
+    title: "Vision",
+    body: "A city where capable students can continue college with dependable local government support.",
   },
   {
     number: "03",
     title: "Who We Serve",
-    body: "Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante.",
+    body: "Residents of San Pablo City who meet scholarship requirements and need a reliable path to apply, track, and complete their records.",
   },
 ];
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen pt-28 pb-24" style={{ background: "#faf8f3" }}>
-      <div className="max-w-5xl mx-auto px-6">
-
-        {/* Header */}
-        <div className="mb-20 border-b pb-16" style={{ borderColor: "var(--sand)" }}>
-          <p className="font-mono text-xs tracking-[0.3em] uppercase mb-4"
-            style={{ color: "var(--green-bright)" }}>About Us</p>
-          <h1 className="h1 font-sanserif text-6xl md:text-7xl font-bold leading-tight mb-8"
-            style={{ color: "var(--green-deep)" }}>
-            Empowering Students
+    <main className="page-shell pt-32 pb-24">
+      <div className="page-container">
+        <section className="mb-16 max-w-4xl section-divider pt-10">
+          <p className="eyebrow mb-4">About Us</p>
+          <h1 className="page-title text-5xl md:text-7xl mb-7">
+            Built for San Pablo students
           </h1>
-          <p className="font-body text-lg max-w-2xl leading-relaxed" style={{ color: "var(--muted)" }}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl vel
-            ultricies lacinia. Quisque vehicula magna at libero tincidunt, sit amet dignissim
-            erat efficitur vitae aliquam est.
+          <p className="lead text-lg max-w-2xl">
+            The Scholarship Office helps residents apply for city scholarship support, track requirements, and stay updated through one official portal.
           </p>
-        </div>
+        </section>
 
-        {/* Pillars */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-24">
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-20">
           {pillars.map((p) => (
-            <div key={p.number}>
-              <span className="font-mono text-xs tracking-widest"
-                style={{ color: "var(--green-light)" }}>{p.number}</span>
-              <h2 className="font-display text-2xl font-semibold mt-2 mb-3"
+            <div key={p.number} className="surface p-7">
+              <span className="eyebrow" style={{ color: "var(--green-bright)" }}>{p.number}</span>
+              <h2 className="font-display text-2xl font-semibold mt-3 mb-4"
                 style={{ color: "var(--green-deep)" }}>{p.title}</h2>
               {typeof p.body === 'string' 
-                ? <p className="font-body text-sm leading-relaxed" style={{ color: "var(--muted)" }}>{p.body}</p>
+                ? <p className="lead text-sm">{p.body}</p>
                 : p.body
               }
             </div>
           ))}
-        </div>
+        </section>
 
-        {/* Quote */}
-        <div className="border-l-2 pl-8 py-2" style={{ borderColor: "var(--green-bright)" }}>
-          <blockquote className="font-display text-3xl italic mb-3"
+        <section className="surface-muted p-8 md:p-10">
+          <blockquote className="font-display text-3xl md:text-4xl italic mb-4"
             style={{ color: "var(--green-deep)" }}>
             &quot;Education is the most powerful weapon which you can use to change the world.&quot;
           </blockquote>
-          <cite className="font-mono text-xs tracking-wider not-italic" style={{ color: "var(--muted)" }}>
-            — City Government of San Pablo
+          <cite className="eyebrow not-italic" style={{ color: "var(--muted)" }}>
+            City Government of San Pablo
           </cite>
-        </div>
-
+        </section>
       </div>
     </main>
   );

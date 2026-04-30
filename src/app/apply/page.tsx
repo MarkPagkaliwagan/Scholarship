@@ -10,12 +10,11 @@ export default function ApplyPage() {
 
   return (
     <main
-      className="min-h-screen"
-      style={{ background: "#faf8f3", fontFamily: "'DM Sans', sans-serif" }}
+      className="page-shell"
     >
       <div className="pt-20" />
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 pb-16">
+      <div className="page-container pb-16">
         <div className="flex items-center gap-3 py-6">
           <Link
             href="/"
@@ -28,8 +27,8 @@ export default function ApplyPage() {
               gap: 5,
               padding: "6px 12px 6px 8px",
               borderRadius: 8,
-              background: backHovered ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.7)",
-              border: "1px solid rgba(0,0,0,0.08)",
+              background: backHovered ? "var(--paper)" : "rgba(255,253,248,0.74)",
+              border: "1px solid var(--sand-soft)",
               color: "var(--green-deep)",
               fontSize: 13,
               fontWeight: 500,
@@ -46,33 +45,17 @@ export default function ApplyPage() {
           <span style={{ color: "var(--green-deep)", fontSize: 12, fontWeight: 500 }}>Apply</span>
         </div>
 
-        <div className="text-center mb-10">
-          <p
-            style={{
-              fontSize: 10,
-              fontWeight: 700,
-              letterSpacing: "0.15em",
-              textTransform: "uppercase",
-              color: "var(--green-mid)",
-              marginBottom: 8,
-            }}
-          >
+        <section className="text-center mb-10 section-divider pt-10">
+          <p className="eyebrow mb-3">
             Iskolar ng San Pablo
           </p>
-          <h1
-            style={{
-              fontSize: "clamp(1.5rem, 4vw, 2rem)",
-              fontWeight: 700,
-              color: "var(--green-deep)",
-              marginBottom: 8,
-            }}
-          >
+          <h1 className="page-title text-4xl md:text-5xl mb-4">
             Scholarship Application
           </h1>
-          <p style={{ fontSize: 14, color: "var(--muted)", maxWidth: 480, margin: "0 auto" }}>
+          <p className="lead text-sm max-w-xl mx-auto">
             Fill out all required fields accurately. Fields marked with <span style={{ color: "#dc2626" }}>*</span> are required.
           </p>
-        </div>
+        </section>
 
         <ApplicationForm />
       </div>

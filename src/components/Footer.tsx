@@ -12,13 +12,12 @@ const quickLinks = [
 export default function Footer() {
   return (
     <footer style={{ background: "var(--green-deep)", color: "var(--cream)" }}>
-      <div className="max-w-6xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+      <div className="max-w-6xl mx-auto px-6 py-14">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
 
-          {/* Brand */}
           <div className="md:col-span-1">
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-xl" style={{ background: "rgba(255,255,255,0.1)" }}>
+              <div className="p-2 rounded-lg" style={{ background: "rgba(255,255,255,0.1)" }}>
                 <GraduationCap className="w-6 h-6" style={{ color: "var(--green-light)" }} />
               </div>
               <div>
@@ -29,8 +28,7 @@ export default function Footer() {
               </div>
             </div>
             <p className="font-body text-sm leading-relaxed opacity-60 mb-6">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-              Empowering students through accessible scholarship opportunities.
+              Official scholarship portal for San Pablo students, built for application access, status tracking, and office updates.
             </p>
             <div className="space-y-2 text-sm font-body opacity-60">
               <div className="flex items-center gap-2">
@@ -48,9 +46,8 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Quick Links */}
           <div>
-            <h3 className="font-mono text-xs tracking-[0.3em] uppercase mb-5 opacity-50">
+            <h3 className="font-mono text-[11px] tracking-[0.22em] uppercase mb-5 opacity-50">
               Quick Links
             </h3>
             <ul className="space-y-3">
@@ -65,9 +62,8 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Office Hours */}
           <div>
-            <h3 className="font-mono text-xs tracking-[0.3em] uppercase mb-5 opacity-50">
+            <h3 className="font-mono text-[11px] tracking-[0.22em] uppercase mb-5 opacity-50">
               Office Hours
             </h3>
             <div className="space-y-2 font-body text-sm opacity-60">
@@ -81,7 +77,6 @@ export default function Footer() {
 
         </div>
 
-        {/* Bottom bar */}
         <div className="border-t pt-8 flex flex-col md:flex-row justify-between items-center gap-4"
           style={{ borderColor: "rgba(255,255,255,0.1)" }}>
           <p className="font-mono text-xs opacity-40">

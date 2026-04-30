@@ -124,7 +124,7 @@ function LoginPanel({ open, onClose }: LoginPanelProps) {
 
         {/* Slide panel — comes from right */}
         <div
-          className={`fixed top-0 right-0 h-full z-[110] flex transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+          className={`fixed top-0 right-0 h-full z-[110] flex transition-transform duration-500 [transition-timing-function:cubic-bezier(0.4,0,0.2,1)] ${
             open ? "translate-x-0" : "translate-x-full"
           }`}
           style={{ width: "min(520px, 48vw)" }}
@@ -603,12 +603,11 @@ export default function HomePage() {
       <LoginPanel open={loginOpen} onClose={() => setLoginOpen(false)} />
 
       <main
-        className="min-h-screen transition-all duration-500"
-        style={{ background: "#faf8f3" }}
+        className="page-shell min-h-screen transition-all duration-500"
       >
         {/* ── HERO ─────────────────────────────────────────── */}
         <section
-          className={`relative min-h-screen flex flex-col justify-center overflow-hidden pt-24 pb-20 transition-all duration-500 ${
+          className={`relative min-h-[88vh] flex flex-col justify-center overflow-hidden pt-28 pb-16 transition-all duration-500 ${
             loginOpen ? "md:mr-[min(520px,48vw)]" : ""
           }`}
         >
@@ -635,7 +634,7 @@ export default function HomePage() {
             <div className="max-w-3xl">
               {/* Badge */}
               <div
-                className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full mb-10"
+                className="inline-flex items-center gap-2.5 px-4 py-2 rounded-lg mb-10"
                 style={{
                   background: "rgba(45,106,79,0.09)",
                   border: "1px solid rgba(45,106,79,0.2)",
@@ -687,7 +686,7 @@ export default function HomePage() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   href="/apply"
-                  className="group inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full font-body text-[15px] font-semibold transition-all duration-300 hover:-translate-y-0.5 hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-offset-2"
+                  className="group inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-lg font-body text-[15px] font-semibold transition-all duration-300 hover:-translate-y-0.5 hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-offset-2"
                   style={{
                     background: "linear-gradient(135deg, #2d6a4f 0%, #1a3c2e 100%)",
                     color: "#f0faf4",
@@ -700,7 +699,7 @@ export default function HomePage() {
 
                 <button
                   onClick={() => setLoginOpen(true)}
-                  className="group inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full font-body text-[15px] font-medium transition-all duration-300 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                  className="group inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-lg font-body text-[15px] font-medium transition-all duration-300 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2"
                   style={{
                     background: loginOpen ? "rgba(45,106,79,0.08)" : "transparent",
                     color: "#2d6a4f",
@@ -727,6 +726,42 @@ export default function HomePage() {
                   />
                 </button>
               </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="page-container pb-20">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-16">
+            {stats.map((stat) => (
+              <div key={stat.label} className="surface p-5">
+                <p className="font-display text-3xl font-bold" style={{ color: "var(--green-deep)" }}>{stat.value}</p>
+                <p className="value-label mt-1">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] gap-10 items-start">
+            <div>
+              <p className="eyebrow mb-4">Application Flow</p>
+              <h2 className="page-title text-4xl md:text-5xl mb-5">Clear steps from start to award</h2>
+              <p className="lead">
+                Prepare your documents, submit online, and track your status without visiting multiple offices for basic updates.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {steps.map((step) => (
+                <div key={step.step} className="surface p-6">
+                  <div className="flex items-center justify-between gap-4 mb-5">
+                    <div className="w-11 h-11 rounded-lg flex items-center justify-center" style={{ background: "var(--green-soft)", color: "var(--green-deep)" }}>
+                      <step.icon className="w-5 h-5" />
+                    </div>
+                    <span className="eyebrow" style={{ color: "var(--green-bright)" }}>{step.step}</span>
+                  </div>
+                  <h3 className="font-display text-2xl font-semibold mb-2" style={{ color: "var(--green-deep)" }}>{step.title}</h3>
+                  <p className="lead text-sm">{step.desc}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>

@@ -46,9 +46,9 @@ export default function Navbar() {
     <header
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
       style={{
-        background: scrolled ? "rgba(248,245,239,0.97)" : "transparent",
+        background: scrolled ? "rgba(255,253,248,0.96)" : "rgba(255,253,248,0.76)",
         backdropFilter: scrolled ? "blur(14px)" : "blur(14px)",
-        borderBottom: scrolled ? "1px solid var(--sand)" : "1px solid transparent",
+        borderBottom: scrolled ? "1px solid var(--sand-soft)" : "1px solid rgba(212,201,176,0.36)",
       }}
     >
       <div className="w-full h-0.5" style={{ background: "var(--green-deep)" }} />
@@ -57,7 +57,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-20">
           <Link href="/" className="flex items-center gap-4 group">
             <div
-              className="w-12 h-12 flex items-center justify-center rounded-xl transition-opacity group-hover:opacity-90"
+              className="w-11 h-11 flex items-center justify-center rounded-lg transition-opacity group-hover:opacity-90"
               style={{ background: "var(--green-deep)" }}
             >
               <GraduationCap className="w-6 h-6" style={{ color: "var(--cream)" }} />
