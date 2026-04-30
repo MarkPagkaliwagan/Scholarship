@@ -18,6 +18,7 @@ import {
   LogIn,
   ArrowRight,
   ChevronRight,
+  ChevronDown,
 } from "lucide-react";
 import MovingCircleBg from "@/components/MovingCircleBg";
 
@@ -171,11 +172,11 @@ function LoginPanel({ open, onClose }: LoginPanelProps) {
                   <GraduationCap className="w-5 h-5" style={{ color: "#d8f3dc" }} />
                 </div>
                 <div>
-                  <p className="font-display text-[15px] font-bold leading-none" style={{ color: "#1a3c2e" }}>
-                    San Pablo City Government
+                  <p className="font-display text-[17px] font-bold leading-none" style={{ color: "#1a3c2e" }}>
+                    Iskolar ng San Pablo
                   </p>
-                  <p className="font-body text-[11px] tracking-wider uppercase mt-0.5" style={{ color: "#7a9485" }}>
-                    Scholarship Management Portal
+                  <p className="font-body text-[11px] tracking-wider uppercase mt-1" style={{ color: "#7a9485" }}>
+                    City Government of San Pablo
                   </p>
                 </div>
               </div>
@@ -189,7 +190,7 @@ function LoginPanel({ open, onClose }: LoginPanelProps) {
                   Sign in to your account
                 </h2>
                 <p className="font-body text-[14px] leading-relaxed" style={{ color: "#6b7280" }}>
-                  Access your scholarship dashboard and application status.
+                  Access your San Pablo Scholars dashboard and application status.
                 </p>
               </div>
 
@@ -380,7 +381,7 @@ function LoginPanel({ open, onClose }: LoginPanelProps) {
                     className="font-semibold hover:underline underline-offset-2 transition-colors"
                     style={{ color: "#2d6a4f" }}
                   >
-                    Apply for a Scholarship
+                    Create Account to Apply
                   </Link>
                 </p>
 
@@ -393,9 +394,9 @@ function LoginPanel({ open, onClose }: LoginPanelProps) {
                   style={{ background: "#f9fafb", border: "1px solid #e5e7eb" }}
                 >
                   <p className="font-body text-[11px] leading-relaxed text-center" style={{ color: "#9ca3af" }}>
-                    <span className="font-semibold" style={{ color: "#6b7280" }}>City Government of San Pablo</span>
+                    <span className="font-semibold" style={{ color: "#6b7280" }}>Iskolar ng San Pablo</span>
                     <br />
-                    Scholarship Office · (049) 562-0000
+                    City Government of San Pablo · (049) 562-0000
                     <br />
                     For official use only. Unauthorized access is prohibited.
                   </p>
@@ -438,10 +439,10 @@ function LoginPanel({ open, onClose }: LoginPanelProps) {
               </div>
               <div>
                 <h2 className="font-display text-xl font-bold" style={{ color: "#1a3c2e" }}>
-                  Welcome back
+                  Iskolar ng San Pablo
                 </h2>
-                <p className="font-body text-xs mt-0.5" style={{ color: "#7a9485" }}>
-                  Sign in to your account
+                <p className="font-body text-[10px] tracking-wider uppercase mt-0.5" style={{ color: "#7a9485" }}>
+                  City Government of San Pablo
                 </p>
               </div>
             </div>
@@ -560,9 +561,9 @@ function LoginPanel({ open, onClose }: LoginPanelProps) {
               )}
 
               <p className="text-center font-body text-[13px]" style={{ color: "#7a9485" }}>
-                Don&apos;t have an account?{" "}
+                No San Pablo Scholars account?{" "}
                 <Link href="/apply" className="font-semibold hover:underline" style={{ color: "#2d6a4f" }}>
-                  Apply now
+                  Create one
                 </Link>
               </p>
             </form>
@@ -607,7 +608,7 @@ export default function HomePage() {
       >
         {/* ── HERO ─────────────────────────────────────────── */}
         <section
-          className={`relative min-h-[88vh] flex flex-col justify-center overflow-hidden pt-28 pb-16 transition-all duration-500 ${
+          className={`relative min-h-screen flex flex-col justify-center items-center overflow-hidden transition-all duration-500 ${
             loginOpen ? "md:mr-[min(520px,48vw)]" : ""
           }`}
         >
@@ -616,116 +617,92 @@ export default function HomePage() {
             className="absolute inset-0"
             style={{
               background:
-                "radial-gradient(ellipse 80% 60% at 70% 30%, rgba(64,145,108,0.12) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 20% 80%, rgba(82,183,136,0.08) 0%, transparent 50%), #faf8f3",
+                "radial-gradient(ellipse 70% 55% at 50% 40%, rgba(64,145,108,0.13) 0%, transparent 65%), radial-gradient(ellipse 50% 40% at 80% 80%, rgba(82,183,136,0.07) 0%, transparent 50%), #faf8f3",
             }}
           />
-          {/* Subtle dot grid */}
+          {/* Dot grid */}
           <div
-            className="absolute inset-0 opacity-30"
+            className="absolute inset-0 opacity-25"
             style={{
-              backgroundImage: "radial-gradient(circle, #c8d8cc 1px, transparent 1px)",
-              backgroundSize: "32px 32px",
+              backgroundImage: "radial-gradient(circle, #b8ccbc 1px, transparent 1px)",
+              backgroundSize: "36px 36px",
             }}
           />
 
           <MovingCircleBg />
 
-          <div className="relative z-10 max-w-6xl mx-auto px-6 w-full">
-            <div className="max-w-3xl">
-              {/* Badge */}
-              <div
-                className="inline-flex items-center gap-2.5 px-4 py-2 rounded-lg mb-10"
-                style={{
-                  background: "rgba(45,106,79,0.09)",
-                  border: "1px solid rgba(45,106,79,0.2)",
-                }}
-              >
-                <span className="relative flex h-2 w-2">
-                  <span
-                    className="absolute inline-flex h-full w-full rounded-full opacity-75 animate-ping"
-                    style={{ background: "#40916c" }}
-                  />
-                  <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: "#40916c" }} />
-                </span>
+          <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-4xl mx-auto pt-28 pb-20">
+            {/* Eyebrow */}
+            <p className="eyebrow mb-5">City Government of San Pablo</p>
+
+            {/* Status badge */}
+            <div
+              className="inline-flex items-center gap-2.5 px-4 py-2 rounded-lg mb-10"
+              style={{
+                background: "rgba(45,106,79,0.09)",
+                border: "1px solid rgba(45,106,79,0.22)",
+              }}
+            >
+              <span className="relative flex h-2 w-2">
                 <span
-                  className="font-mono text-[11.5px] tracking-widest font-semibold uppercase"
-                  style={{ color: "#2d6a4f" }}
-                >
-                  A.Y. 2026 Applications Now Open
-                </span>
-              </div>
-
-              {/* Headline */}
-              <h1
-                className="font-display text-[52px] md:text-[72px] font-bold leading-[1.05] tracking-tight mb-6"
-                style={{ color: "#1a3c2e" }}
+                  className="absolute inline-flex h-full w-full rounded-full opacity-75 animate-ping"
+                  style={{ background: "#40916c" }}
+                />
+                <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: "#40916c" }} />
+              </span>
+              <span
+                className="font-body text-[11.5px] tracking-widest font-semibold uppercase"
+                style={{ color: "#2d6a4f" }}
               >
-                Empowering
-                <br />
-                <span
-                  style={{
-                    background: "linear-gradient(135deg, #2d6a4f 0%, #52b788 100%)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                  }}
-                >
-                  San Pablo&apos;s Future
-                </span>
-              </h1>
+                A.Y. 2026 Applications Now Open
+              </span>
+            </div>
 
-              <p
-                className="font-body text-lg md:text-xl leading-relaxed mb-10 max-w-xl"
-                style={{ color: "#5a7a6a" }}
+            {/* Primary headline */}
+            <h1 className="page-title text-[60px] sm:text-[80px] md:text-[100px] leading-[0.92] mb-5">
+              Iskolar ng<br />San Pablo
+            </h1>
+
+            {/* Sub-headline */}
+            <p
+              className="font-display text-[20px] md:text-[26px] font-semibold mb-6 leading-snug"
+              style={{ color: "#2d6a4f" }}
+            >
+              Empowering San Pablo&apos;s Future
+            </p>
+
+            <p className="lead text-base md:text-lg mb-12 max-w-xl">
+              The City Government of San Pablo supports deserving students through the City Iskolar ng San Pablo
+              program — accessible, transparent, and fair.
+            </p>
+
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="/apply"
+                className="group btn-primary px-9 py-4 font-body text-[15px] font-semibold"
               >
-                The City Government of San Pablo is committed to supporting deserving students through the City
-                Scholarship Program — accessible, transparent, and fair.
-              </p>
+                Create Account to Apply
+                <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+              </Link>
 
-              {/* CTA Row */}
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link
-                  href="/apply"
-                  className="group inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-lg font-body text-[15px] font-semibold transition-all duration-300 hover:-translate-y-0.5 hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-offset-2"
-                  style={{
-                    background: "linear-gradient(135deg, #2d6a4f 0%, #1a3c2e 100%)",
-                    color: "#f0faf4",
-                    boxShadow: "0 12px 30px -6px rgba(26,60,46,0.35)",
-                  }}
-                >
-                  Apply for Scholarship
-                  <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-                </Link>
+              <button
+                onClick={() => setLoginOpen(true)}
+                className="group btn-secondary px-9 py-4 font-body text-[15px] font-medium"
+              >
+                {loginOpen ? "Panel Open" : "Sign In to Portal"}
+                <ChevronRight
+                  className={`w-4 h-4 transition-transform duration-300 ${
+                    loginOpen ? "rotate-180" : "group-hover:translate-x-0.5"
+                  }`}
+                />
+              </button>
+            </div>
 
-                <button
-                  onClick={() => setLoginOpen(true)}
-                  className="group inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-lg font-body text-[15px] font-medium transition-all duration-300 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2"
-                  style={{
-                    background: loginOpen ? "rgba(45,106,79,0.08)" : "transparent",
-                    color: "#2d6a4f",
-                    border: `2px solid ${loginOpen ? "#2d6a4f" : "rgba(45,106,79,0.35)"}`,
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!loginOpen) {
-                      (e.currentTarget as HTMLButtonElement).style.background = "rgba(45,106,79,0.06)";
-                      (e.currentTarget as HTMLButtonElement).style.borderColor = "#2d6a4f";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!loginOpen) {
-                      (e.currentTarget as HTMLButtonElement).style.background = "transparent";
-                      (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(45,106,79,0.35)";
-                    }
-                  }}
-                >
-                  {loginOpen ? "Panel Open" : "Sign In to Portal"}
-                  <ChevronRight
-                    className={`w-4 h-4 transition-transform duration-300 ${
-                      loginOpen ? "rotate-180" : "group-hover:translate-x-0.5"
-                    }`}
-                  />
-                </button>
-              </div>
+            {/* Scroll cue */}
+            <div className="mt-16 flex flex-col items-center gap-2" style={{ color: "var(--muted)", opacity: 0.45 }}>
+              <span className="font-body text-[10px] tracking-[0.22em] uppercase">Scroll to explore</span>
+              <ChevronDown className="w-4 h-4 animate-bounce" />
             </div>
           </div>
         </section>

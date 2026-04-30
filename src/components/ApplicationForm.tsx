@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { authClient } from "@/lib/auth-client";
 import * as z from "zod";
-import { CheckCircle2, ChevronRight, ChevronLeft, UploadCloud, FileText, AlertCircle, Loader2, User, GraduationCap, FolderOpen, UserCog, ClipboardCheck, Shield, Badge, Copy, Check } from "lucide-react";
+import { CheckCircle2, ChevronRight, ChevronLeft, FileText, AlertCircle, Loader2, User, GraduationCap, FolderOpen, ClipboardCheck, Badge, Users } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { INCOME_OPTIONS, EMPLOYMENT_OPTIONS } from "@/lib/scholarship-ui";
 
 const personalSchema = z.object({
   firstName: z.string().min(2, "First name is required"),
@@ -24,9 +24,17 @@ const educationSchema = z.object({
   gwa: z.string().regex(/^\d+(\.\d{1,2})?$/, "Please enter a valid GWA (e.g., 1.50 or 92)"),
 });
 
+const familySchema = z.object({
+  monthlyIncome: z.string().min(1, "Please select household income range"),
+  numberOfSiblings: z.string().regex(/^\d+$/, "Enter a number (0 or more)"),
+  guardianOccupation: z.string().min(2, "Occupation is required"),
+  guardianEmploymentStatus: z.string().min(1, "Please select employment status"),
+});
+
 const formSchema = z.object({
   ...personalSchema.shape,
   ...educationSchema.shape,
+  ...familySchema.shape,
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -38,23 +46,24 @@ interface FormStep {
 }
 
 const steps: FormStep[] = [
-  { id: "personal", title: "Personal", icon: User },
+  { id: "personal",  title: "Personal",  icon: User },
   { id: "education", title: "Education", icon: GraduationCap },
+  { id: "family",    title: "Family",    icon: Users },
   { id: "documents", title: "Documents", icon: FolderOpen },
-  { id: "account", title: "Account", icon: UserCog },
-  { id: "review", title: "Review", icon: ClipboardCheck },
+  { id: "review",    title: "Review",    icon: ClipboardCheck },
 ];
 
-export default function ApplicationForm() {
+type ApplicationFormProps = {
+  initialEmail?: string;
+  lockEmail?: boolean;
+  onSubmitted?: (applicationId: string) => void;
+};
+
+export default function ApplicationForm({ initialEmail = "", lockEmail = false, onSubmitted }: ApplicationFormProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [applicationId, setApplicationId] = useState("");
-  const [accountUsername, setAccountUsername] = useState("");
-  const [accountPassword, setAccountPassword] = useState("");
-  const [accountError, setAccountError] = useState<string | null>(null);
-  const [accountCreated, setAccountCreated] = useState(false);
-  const [copied, setCopied] = useState(false);
 
   const {
     register,
@@ -65,6 +74,9 @@ export default function ApplicationForm() {
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     mode: "onChange",
+    defaultValues: {
+      email: initialEmail,
+    },
   });
 
   const nextStep = async () => {
@@ -73,22 +85,8 @@ export default function ApplicationForm() {
       isValid = await trigger(["firstName", "lastName", "email", "phone", "address"]);
     } else if (currentStep === 1) {
       isValid = await trigger(["schoolName", "course", "yearLevel", "gwa"]);
-    } else if (currentStep === 3) {
-      if (!accountUsername.trim()) { setAccountError("Username is required."); return; }
-      if (!accountPassword) { setAccountError("Password is required."); return; }
-      if (!accountCreated) {
-        setIsSubmitting(true);
-        setAccountError(null);
-        const { error } = await authClient.signUp.email({
-          email: getValues("email"),
-          password: accountPassword,
-          name: accountUsername,
-        });
-        setIsSubmitting(false);
-        if (error) { setAccountError(error.message ?? "Account creation failed."); return; }
-        setAccountCreated(true);
-      }
-      isValid = true;
+    } else if (currentStep === 2) {
+      isValid = await trigger(["monthlyIncome", "numberOfSiblings", "guardianOccupation", "guardianEmploymentStatus"]);
     } else {
       isValid = true;
     }
@@ -116,6 +114,7 @@ export default function ApplicationForm() {
       const { applicationId: id } = await res.json();
       setApplicationId(id);
       setIsSuccess(true);
+      onSubmitted?.(id);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } finally {
       setIsSubmitting(false);
@@ -160,6 +159,9 @@ export default function ApplicationForm() {
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link href="/" className="btn-primary px-8 py-3 font-medium">
             Return to Homepage
+          </Link>
+          <Link href="/dashboard" className="btn-secondary px-8 py-3 font-medium">
+            Go to Dashboard
           </Link>
           <Link href="/howtoapply" className="btn-secondary px-8 py-3 font-medium">
             View Application Guide
@@ -290,12 +292,20 @@ export default function ApplicationForm() {
                       type="email" 
                       {...register("email")} 
                       placeholder="your.email@example.com"
+                      readOnly={lockEmail}
                       className={`w-full px-4 py-3.5 rounded-lg border-2 transition-all ${
                         errors.email 
                           ? 'border-red-300 bg-red-50 focus:border-red-500' 
-                          : 'border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30'
-                      } focus:bg-white focus:outline-none`} 
+                          : lockEmail
+                            ? 'border-[var(--sand-soft)] bg-[var(--cream)]'
+                            : 'border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30'
+                      } focus:bg-white focus:outline-none`}
                     />
+                    {lockEmail && (
+                      <p className="text-xs mt-1" style={{ color: "var(--muted)" }}>
+                        Email comes from your San Pablo Scholars account.
+                      </p>
+                    )}
                     {errors.email && (
                       <p className="text-red-500 text-xs flex items-center gap-1 mt-1">
                         <AlertCircle className="w-3 h-3" /> {errors.email.message}
@@ -460,6 +470,122 @@ export default function ApplicationForm() {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
               >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label htmlFor="monthlyIncome" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>
+                      Monthly Household Income <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      id="monthlyIncome"
+                      {...register("monthlyIncome")}
+                      className={`w-full px-4 py-3.5 rounded-lg border-2 transition-all appearance-none ${
+                        errors.monthlyIncome
+                          ? "border-red-300 bg-red-50 focus:border-red-500"
+                          : "border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30"
+                      } focus:bg-white focus:outline-none`}
+                      style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundPosition: "right 1rem center", backgroundSize: "1.25rem", backgroundRepeat: "no-repeat" }}
+                    >
+                      <option value="">Select income range...</option>
+                      {INCOME_OPTIONS.map((o) => (
+                        <option key={o.value} value={o.value}>{o.label}</option>
+                      ))}
+                    </select>
+                    {errors.monthlyIncome && (
+                      <p className="text-red-500 text-xs flex items-center gap-1 mt-1">
+                        <AlertCircle className="w-3 h-3" /> {errors.monthlyIncome.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="numberOfSiblings" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>
+                      Number of Siblings <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      id="numberOfSiblings"
+                      type="number"
+                      min={0}
+                      max={20}
+                      {...register("numberOfSiblings")}
+                      placeholder="e.g., 3"
+                      className={`w-full px-4 py-3.5 rounded-lg border-2 transition-all ${
+                        errors.numberOfSiblings
+                          ? "border-red-300 bg-red-50 focus:border-red-500"
+                          : "border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30"
+                      } focus:bg-white focus:outline-none`}
+                    />
+                    {errors.numberOfSiblings && (
+                      <p className="text-red-500 text-xs flex items-center gap-1 mt-1">
+                        <AlertCircle className="w-3 h-3" /> {errors.numberOfSiblings.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="guardianOccupation" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>
+                      Parent / Guardian Occupation <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      id="guardianOccupation"
+                      {...register("guardianOccupation")}
+                      placeholder="e.g., Farmer, Vendor, Driver"
+                      className={`w-full px-4 py-3.5 rounded-lg border-2 transition-all ${
+                        errors.guardianOccupation
+                          ? "border-red-300 bg-red-50 focus:border-red-500"
+                          : "border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30"
+                      } focus:bg-white focus:outline-none`}
+                    />
+                    {errors.guardianOccupation && (
+                      <p className="text-red-500 text-xs flex items-center gap-1 mt-1">
+                        <AlertCircle className="w-3 h-3" /> {errors.guardianOccupation.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="guardianEmploymentStatus" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>
+                      Employment Status <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      id="guardianEmploymentStatus"
+                      {...register("guardianEmploymentStatus")}
+                      className={`w-full px-4 py-3.5 rounded-lg border-2 transition-all appearance-none ${
+                        errors.guardianEmploymentStatus
+                          ? "border-red-300 bg-red-50 focus:border-red-500"
+                          : "border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30"
+                      } focus:bg-white focus:outline-none`}
+                      style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundPosition: "right 1rem center", backgroundSize: "1.25rem", backgroundRepeat: "no-repeat" }}
+                    >
+                      <option value="">Select status...</option>
+                      {EMPLOYMENT_OPTIONS.map((o) => (
+                        <option key={o.value} value={o.value}>{o.label}</option>
+                      ))}
+                    </select>
+                    {errors.guardianEmploymentStatus && (
+                      <p className="text-red-500 text-xs flex items-center gap-1 mt-1">
+                        <AlertCircle className="w-3 h-3" /> {errors.guardianEmploymentStatus.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-5 p-4 rounded-lg flex items-center gap-3" style={{ background: "var(--parchment)" }}>
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" style={{ color: "var(--green-bright)" }} />
+                  <p className="text-sm" style={{ color: "var(--muted)" }}>
+                    This information is used only for eligibility assessment and is kept confidential.
+                  </p>
+                </div>
+              </motion.div>
+            )}
+
+            {currentStep === 3 && (
+              <motion.div
+                key="step-3"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
                 <div className="space-y-4">
                   {[
                     { label: "Certificate of Residency", desc: "Issued by Barangay (last 3 months)", required: true },
@@ -487,10 +613,10 @@ export default function ApplicationForm() {
                         </div>
                       </div>
                       <div 
-                        className="px-5 py-2.5 rounded-lg font-medium text-sm flex items-center gap-2 transition-all hover:opacity-80"
-                        style={{ background: "var(--green-deep)", color: "white" }}
+                        className="px-5 py-2.5 rounded-lg font-medium text-sm flex items-center gap-2"
+                        style={{ background: "var(--paper)", color: "var(--green-deep)", border: "1px solid var(--sand-soft)" }}
                       >
-                        <UploadCloud className="w-4 h-4" /> Upload
+                        Prepare file
                       </div>
                     </div>
                   ))}
@@ -501,91 +627,8 @@ export default function ApplicationForm() {
                 >
                   <AlertCircle className="w-4 h-4 flex-shrink-0" style={{ color: "var(--green-bright)" }} />
                   <p className="text-sm" style={{ color: "var(--muted)" }}>
-                    Accepted: PDF, JPG, PNG (max 10MB per file)
+                    Upload storage is not enabled yet. Keep files ready for scholarship office validation.
                   </p>
-                </div>
-              </motion.div>
-            )}
-
-            {currentStep === 3 && (
-              <motion.div
-                key="step-3"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div 
-                  className="p-5 rounded-lg mb-6 flex items-start gap-4"
-                  style={{ background: "rgba(45, 106, 79, 0.06)", border: "1px solid rgba(45, 106, 79, 0.1)" }}
-                >
-                  <Shield className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: "var(--green-mid)" }} />
-                  <div>
-                    <p className="font-medium mb-1" style={{ color: "var(--green-deep)" }}>Create Your Account</p>
-                    <p className="text-sm" style={{ color: "var(--muted)" }}>Track your application status and receive updates.</p>
-                  </div>
-                </div>
-                
-                <div className="space-y-5">
-                  <div className="space-y-2">
-                    <label htmlFor="username" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>
-                      Username <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      id="username"
-                      type="text"
-                      value={accountUsername}
-                      onChange={(e) => { setAccountUsername(e.target.value); setAccountError(null); }}
-                      placeholder="Choose a username"
-                      className="w-full px-4 py-3.5 rounded-lg border-2 border-gray-100 focus:border-[var(--green-bright)] bg-gray-50/30 focus:bg-white focus:outline-none transition-all"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>
-                      Password <span className="text-red-500">*</span>
-                    </label>
-                    <div className="flex gap-2">
-                      <input
-                        type="password"
-                        value={accountPassword}
-                        readOnly
-                        placeholder="Click Generate Password"
-                        className="flex-1 px-4 py-3.5 rounded-lg border-2 border-gray-100 bg-gray-50/30 focus:outline-none"
-                        style={{ color: accountPassword ? "var(--green-deep)" : "var(--muted)" }}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const pwd = "Sp" + Math.random().toString(36).slice(-4).toUpperCase() + Math.random().toString(36).slice(-4) + "!@#$"[0] + Math.floor(Math.random() * 999) + 1;
-                          setAccountPassword(pwd);
-                          setAccountError(null);
-                        }}
-                        className="px-4 py-3 rounded-lg font-medium transition-all"
-                        style={{ background: "var(--green-deep)", color: "white" }}
-                      >
-                        Generate
-                      </button>
-                      {accountPassword && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            navigator.clipboard.writeText(accountPassword);
-                            setCopied(true);
-                            setTimeout(() => setCopied(false), 2000);
-                          }}
-                          className="px-4 py-3 rounded-lg font-medium transition-all"
-                          style={{ background: "var(--cream)", color: "var(--green-deep)" }}
-                        >
-                          {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                  {accountError && (
-                    <p className="text-red-500 text-xs flex items-center gap-1">
-                      <AlertCircle className="w-3 h-3" /> {accountError}
-                    </p>
-                  )}
                 </div>
               </motion.div>
             )}
@@ -656,6 +699,37 @@ export default function ApplicationForm() {
                       <div className="p-4 rounded-lg bg-white border" style={{ borderColor: "var(--sand)" }}>
                         <p className="text-xs mb-1" style={{ color: "var(--muted)" }}>GWA</p>
                         <p className="font-medium" style={{ color: "var(--green-deep)" }}>{getValues("gwa") || "—"}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <Users className="w-4 h-4" style={{ color: "var(--green-bright)" }} />
+                      <h3 className="text-[10px] uppercase tracking-widest font-semibold" style={{ color: "var(--green-mid)" }}>
+                        Family Background
+                      </h3>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                      <div className="p-4 rounded-lg bg-white border" style={{ borderColor: "var(--sand)" }}>
+                        <p className="text-xs mb-1" style={{ color: "var(--muted)" }}>Monthly Household Income</p>
+                        <p className="font-medium" style={{ color: "var(--green-deep)" }}>
+                          {INCOME_OPTIONS.find((o) => o.value === getValues("monthlyIncome"))?.label || "—"}
+                        </p>
+                      </div>
+                      <div className="p-4 rounded-lg bg-white border" style={{ borderColor: "var(--sand)" }}>
+                        <p className="text-xs mb-1" style={{ color: "var(--muted)" }}>Number of Siblings</p>
+                        <p className="font-medium" style={{ color: "var(--green-deep)" }}>{getValues("numberOfSiblings") || "—"}</p>
+                      </div>
+                      <div className="p-4 rounded-lg bg-white border" style={{ borderColor: "var(--sand)" }}>
+                        <p className="text-xs mb-1" style={{ color: "var(--muted)" }}>Guardian Occupation</p>
+                        <p className="font-medium" style={{ color: "var(--green-deep)" }}>{getValues("guardianOccupation") || "—"}</p>
+                      </div>
+                      <div className="p-4 rounded-lg bg-white border" style={{ borderColor: "var(--sand)" }}>
+                        <p className="text-xs mb-1" style={{ color: "var(--muted)" }}>Employment Status</p>
+                        <p className="font-medium" style={{ color: "var(--green-deep)" }}>
+                          {EMPLOYMENT_OPTIONS.find((o) => o.value === getValues("guardianEmploymentStatus"))?.label || "—"}
+                        </p>
                       </div>
                     </div>
                   </div>
