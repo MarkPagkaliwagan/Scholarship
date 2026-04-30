@@ -103,7 +103,7 @@ function LoginPanel({ open, onClose }: LoginPanelProps) {
       return;
     }
     onClose();
-    router.push("/dashboard");
+    router.replace("/dashboard");
   };
 
   const inputBase =
