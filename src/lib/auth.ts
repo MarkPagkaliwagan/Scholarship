@@ -7,4 +7,10 @@ export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: "pg", schema }),
   emailAndPassword: { enabled: true },
   baseURL: process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001",
+
+  trustedOrigins: [
+    "http://localhost:3000",
+    "http://localhost:5001",
+    "https://scholarship.igat.com.ph",
+  ],
 });
