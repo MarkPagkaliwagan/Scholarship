@@ -88,6 +88,7 @@ export default function ProfilePage() {
 
   const handleSave = async () => {
     if (!formData) return;
+    if (!user?.email) return;
     setSaving(true);
     try {
       const res = await fetch(`/api/applications?email=${encodeURIComponent(user.email)}`, {
