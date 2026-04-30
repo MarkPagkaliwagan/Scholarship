@@ -1,10 +1,21 @@
 import { pgTable, serial, varchar, text, smallint, numeric, timestamp, boolean, check } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
+export const user = pgTable("user", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  emailVerified: boolean("email_verified").notNull(),
+  image: text("image"),
+  createdAt: timestamp("created_at").notNull(),
+  updatedAt: timestamp("updated_at").notNull(),
+});
+
 export const applications = pgTable(
   "applications",
   {
     id: serial("id").primaryKey(),
+    userId: text("user_id").references(() => user.id, { onDelete: "cascade" }).unique(),
     applicationId: varchar("application_id", { length: 20 }).unique().notNull(),
     firstName: varchar("first_name", { length: 100 }).notNull(),
     lastName: varchar("last_name", { length: 100 }).notNull(),
@@ -15,6 +26,10 @@ export const applications = pgTable(
     course: varchar("course", { length: 255 }).notNull(),
     yearLevel: smallint("year_level").notNull(),
     gwa: numeric("gwa", { precision: 5, scale: 2 }).notNull(),
+    monthlyIncome: varchar("monthly_income", { length: 30 }),
+    numberOfSiblings: smallint("number_of_siblings"),
+    guardianOccupation: varchar("guardian_occupation", { length: 255 }),
+    guardianEmploymentStatus: varchar("guardian_employment_status", { length: 30 }),
     status: varchar("status", { length: 20 }).notNull().default("pending"),
     remarks: text("remarks"),
     submittedAt: timestamp("submitted_at", { withTimezone: true }).notNull().defaultNow(),
@@ -28,16 +43,6 @@ export const applications = pgTable(
 
 export type Application = typeof applications.$inferSelect;
 export type NewApplication = typeof applications.$inferInsert;
-
-export const user = pgTable("user", {
-  id: text("id").primaryKey(),
-  name: text("name").notNull(),
-  email: text("email").notNull().unique(),
-  emailVerified: boolean("email_verified").notNull(),
-  image: text("image"),
-  createdAt: timestamp("created_at").notNull(),
-  updatedAt: timestamp("updated_at").notNull(),
-});
 
 export const session = pgTable("session", {
   id: text("id").primaryKey(),

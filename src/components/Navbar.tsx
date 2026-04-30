@@ -64,7 +64,7 @@ export default function Navbar() {
             </div>
             <div className="flex flex-col leading-none">
               <span className="font-display text-xl font-bold tracking-tight" style={{ color: "var(--green-deep)" }}>
-                Scholarship Office
+                Iskolar ng San Pablo
               </span>
               <span className="font-mono text-[9px] tracking-[0.18em] uppercase mt-0.5" style={{ color: "var(--muted)" }}>
                 City Government of San Pablo

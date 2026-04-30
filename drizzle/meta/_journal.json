@@ -8,6 +8,13 @@
       "when": 1777270366318,
       "tag": "0000_harsh_molly_hayes",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1777529874329,
+      "tag": "0001_fearless_whiplash",
+      "breakpoints": true
     }
   ]
 }

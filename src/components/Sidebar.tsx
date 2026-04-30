@@ -97,7 +97,7 @@ export default function Sidebar({ menuOpen, setMenuOpen, navLinks, pathname, use
             <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "var(--green-deep)" }}>
               <Home className="w-4 h-4" style={{ color: "var(--cream)" }} />
             </div>
-            <span className="font-display text-base font-bold" style={{ color: "var(--green-deep)" }}>Scholarship Office</span>
+            <span className="font-display text-base font-bold" style={{ color: "var(--green-deep)" }}>Iskolar ng San Pablo</span>
           </div>
           <button onClick={() => setMenuOpen(false)} className="opacity-50 hover:opacity-100 transition-opacity">
             <X className="w-5 h-5" style={{ color: "var(--green-deep)" }} />

@@ -21,14 +21,14 @@ export default function Footer() {
                 <GraduationCap className="w-6 h-6" style={{ color: "var(--green-light)" }} />
               </div>
               <div>
-                <p className="font-display text-sm font-bold">Scholarship Office</p>
+                <p className="font-display text-sm font-bold">Iskolar ng San Pablo</p>
                 <p className="font-mono text-[10px] tracking-wider uppercase opacity-50">
                   City Government of San Pablo
                 </p>
               </div>
             </div>
             <p className="font-body text-sm leading-relaxed opacity-60 mb-6">
-              Official scholarship portal for San Pablo students, built for application access, status tracking, and office updates.
+              Official Iskolar ng San Pablo portal for application access, status tracking, and office updates.
             </p>
             <div className="space-y-2 text-sm font-body opacity-60">
               <div className="flex items-center gap-2">

@@ -1,78 +1,79 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import {
+  Award,
+  BookOpen,
+  CalendarDays,
+  CheckCircle2,
+  FileText,
+  GraduationCap,
+  Loader2,
+  Mail,
+  MapPin,
+  Phone,
+  Save,
+  User,
+  Users,
+  X,
+} from "lucide-react";
+import { INCOME_LABELS, INCOME_OPTIONS, EMPLOYMENT_LABELS, EMPLOYMENT_OPTIONS } from "@/lib/scholarship-ui";
+import ScholarShell from "@/components/ScholarShell";
 import { authClient } from "@/lib/auth-client";
-import { User, Home, GraduationCap, FileText, Save, Loader2, Camera, Phone, MapPin, Calendar, Book, Award, Users } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import {
+  DOCUMENT_REQUIREMENTS,
+  type ScholarApplication,
+  formatDate,
+  formatYearLevel,
+  getProfileCompleteness,
+  getStatusMeta,
+} from "@/lib/scholarship-ui";
 
-interface Application {
-  id: number;
-  applicationId: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  address: string;
-  schoolName: string;
-  course: string;
-  yearLevel: number;
-  gwa: string;
-  status: string;
-  submittedAt: string;
-  guardianName?: string;
-  guardianPhone?: string;
-  birthday?: string;
-}
-
-const menuItems = [
-  { href: "/dashboard", label: "Dashboard", icon: Home },
-  { href: "/profile", label: "My Profile", icon: User },
-];
+type ScholarUser = {
+  name?: string;
+  email?: string;
+};
 
 export default function ProfilePage() {
   const router = useRouter();
-  const pathname = usePathname();
-  const [user, setUser] = useState<null | { name?: string; email?: string }>(null);
-  const [application, setApplication] = useState<Application | null>(null);
+  const [user, setUser] = useState<ScholarUser | null>(null);
+  const [application, setApplication] = useState<ScholarApplication | null>(null);
+  const [formData, setFormData] = useState<ScholarApplication | null>(null);
   const [loading, setLoading] = useState(true);
-  const [sidebarHover, setSidebarHover] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const sidebarOpen = sidebarHover;
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [formData, setFormData] = useState<Application | null>(null);
-
-  const fetchApplication = async (email: string) => {
-    try {
-      const res = await fetch(`/api/applications?email=${encodeURIComponent(email)}`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.length > 0) {
-          setApplication(data[0]);
-          setFormData(data[0]);
-        }
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [checkedDocs, setCheckedDocs] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    const checkAuth = async () => {
+    const loadProfile = async () => {
       const session = await authClient.getSession();
       const currentUser = session?.data?.user;
+
       if (!currentUser) {
         router.push("/?login=1");
         return;
       }
+
       setUser(currentUser);
-      fetchApplication(currentUser.email);
+
+      try {
+        const response = await fetch(`/api/applications?email=${encodeURIComponent(currentUser.email)}`);
+        if (response.ok) {
+          const applications = (await response.json()) as ScholarApplication[];
+          const currentApplication = applications[0] ?? null;
+          setApplication(currentApplication);
+          setFormData(currentApplication);
+        }
+      } finally {
+        setLoading(false);
+      }
     };
-    checkAuth();
+
+    loadProfile();
   }, [router]);
 
   const handleSignOut = async () => {
@@ -80,18 +81,26 @@ export default function ProfilePage() {
     router.push("/");
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    if (formData) {
-      setFormData({ ...formData, [e.target.name]: e.target.value });
-    }
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = event.target;
+    setFormData((current) => (current ? { ...current, [name]: value } : current));
+    setSaveError(null);
+  };
+
+  const handleCancel = () => {
+    setFormData(application);
+    setEditing(false);
+    setSaveError(null);
   };
 
   const handleSave = async () => {
-    if (!formData) return;
-    if (!user?.email) return;
+    if (!formData || !user?.email) return;
+
     setSaving(true);
+    setSaveError(null);
+
     try {
-      const res = await fetch(`/api/applications?email=${encodeURIComponent(user.email)}`, {
+      const response = await fetch(`/api/applications?email=${encodeURIComponent(user.email)}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -101,472 +110,463 @@ export default function ProfilePage() {
           address: formData.address,
           schoolName: formData.schoolName,
           course: formData.course,
-          yearLevel: formData.yearLevel,
+          yearLevel: Number(formData.yearLevel),
           gwa: formData.gwa,
-          guardianName: formData.guardianName,
-          guardianPhone: formData.guardianPhone,
-          birthday: formData.birthday,
+          monthlyIncome: formData.monthlyIncome ?? undefined,
+          numberOfSiblings: formData.numberOfSiblings != null ? Number(formData.numberOfSiblings) : undefined,
+          guardianOccupation: formData.guardianOccupation ?? undefined,
+          guardianEmploymentStatus: formData.guardianEmploymentStatus ?? undefined,
         }),
       });
-      if (res.ok) {
-        setApplication(formData);
-        setEditing(false);
+
+      if (!response.ok) {
+        throw new Error("Unable to save profile changes.");
       }
-    } catch (e) {
-      console.error(e);
+
+      setApplication(formData);
+      setEditing(false);
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : "Unable to save profile changes.");
     } finally {
       setSaving(false);
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "approved": return { bg: "#dcfce7", text: "#16a34a" };
-      case "rejected": return { bg: "#fee2e2", text: "#dc2626" };
-      case "in_review": return { bg: "#fef3c7", text: "#d97706" };
-      default: return { bg: "#f3f4f6", text: "#6b7280" };
-    }
-  };
-
   if (loading) {
     return (
-      <div className="dashboard-main min-h-screen flex items-center justify-center">
-        <div className="animate-pulse flex flex-col items-center gap-4">
-          <div className="w-12 h-12 rounded-lg" style={{ background: "var(--green-deep)" }} />
-          <p style={{ color: "var(--muted)" }}>Loading...</p>
+      <div className="dashboard-main flex min-h-screen items-center justify-center">
+        <div className="flex animate-pulse flex-col items-center gap-4">
+          <div className="h-12 w-12 rounded-xl bg-[var(--green-deep)]" />
+          <p className="text-sm font-medium text-[var(--muted)]">Loading scholar profile...</p>
         </div>
       </div>
     );
   }
 
+  const status = getStatusMeta(application?.status);
+  const StatusIcon = status.icon;
+  const completeness = getProfileCompleteness(application);
+
   return (
-    <div className="dashboard-main min-h-screen flex">
-      <motion.aside
-        initial={false}
-        animate={{ width: sidebarOpen ? 260 : 72 }}
-        onMouseEnter={() => setSidebarHover(true)}
-        onMouseLeave={() => setSidebarHover(false)}
-        className="fixed left-0 top-0 bottom-0 z-40 flex-col transition-[width] duration-150 hidden lg:flex"
-        style={{ background: "var(--green-deep)", color: "white", boxShadow: "8px 0 30px rgba(26,60,46,0.12)" }}
-      >
-        <div className="p-4 flex items-center justify-center h-20">
-          <GraduationCap className="w-8 h-8 flex-shrink-0" />
-          {sidebarOpen && (
-            <div className="ml-3">
-              <p className="font-bold text-lg leading-tight">Scholarship</p>
-              <p className="text-xs opacity-70">Dashboard</p>
-            </div>
-          )}
-        </div>
-
-        <nav className="flex-1 px-3 py-4 space-y-1">
-          {menuItems.map((item) => {
-            const isActive = pathname === item.href;
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-150 ${
-                  isActive ? "bg-white/20" : "hover:bg-white/10 hover:pl-5"
-                }`}
-              >
-                <Icon className="w-5 h-5 flex-shrink-0" />
-                {sidebarOpen && <span className="font-medium whitespace-nowrap">{item.label}</span>}
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className="p-3 border-t border-white/10">
-          {sidebarOpen ? (
-            <div className="p-3 rounded-lg bg-white/10 mb-2">
-              <p className="text-sm font-medium truncate">{user?.name}</p>
-              <p className="text-xs opacity-70 truncate">{user?.email}</p>
-            </div>
-          ) : (
-            <div className="flex justify-center mb-2">
-              <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
-                <User className="w-5 h-5" />
-              </div>
-            </div>
-          )}
-          <button
-            onClick={handleSignOut}
-            className={`flex items-center gap-3 w-full px-4 py-3 rounded-lg hover:bg-white/10 hover:pl-5 transition-all duration-150 ${
-              sidebarOpen ? "" : "justify-center"
-            }`}
-          >
-            {sidebarOpen && <span>Sign Out</span>}
-          </button>
-        </div>
-      </motion.aside>
-
-      <motion.main
-        initial={false}
-        animate={{ marginLeft: sidebarOpen ? 260 : 72 }}
-        className="flex-1 w-full min-h-screen transition-[margin] duration-150"
-        style={{ paddingTop: "5rem", paddingBottom: "3rem" }}
-      >
-        <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 space-y-4 sm:space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <p className="eyebrow mb-2">Student Record</p>
-              <h1 className="font-display text-3xl sm:text-4xl font-bold" style={{ color: "var(--green-deep)" }}>
-                My Profile
-              </h1>
-              <p className="lead text-sm">
-                Manage your application details
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              {application && (
-                <button
-                  onClick={() => editing ? handleSave() : setEditing(true)}
-                  disabled={saving}
-                  className="px-4 sm:px-5 py-2.5 rounded-lg font-medium transition-all flex items-center gap-2 disabled:opacity-70 text-sm sm:text-base"
-                  style={{ 
-                    background: editing ? "#22c55e" : "var(--green-deep)", 
-                    color: "white" 
-                  }}
-                >
-                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : editing ? <Save className="w-4 h-4" /> : null}
-                  <span className="hidden sm:inline">{editing ? "Save" : "Edit"}</span>
-                  <span className="sm:hidden">{editing ? "Save" : "Edit"}</span>
-                </button>
-              )}
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2 rounded-lg"
-                style={{ background: "var(--green-deep)", color: "white", borderRadius: "8px" }}
-              >
-                <Users className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-
-          <AnimatePresence>
-            {mobileMenuOpen && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="lg:hidden overflow-hidden"
-                style={{ background: "var(--green-deep)", color: "white" }}
-              >
-                <div className="p-4 flex flex-col gap-2">
-                  {menuItems.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="px-4 py-3 rounded-lg"
-                      style={{ 
-                        background: pathname === item.href ? "rgba(255,255,255,0.2)" : "transparent" 
-                      }}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                  <button onClick={handleSignOut} className="px-4 py-3 rounded-lg text-left">
-                    Sign Out
-                  </button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {application && formData ? (
+    <ScholarShell
+      user={user}
+      eyebrow="Iskolar ng San Pablo"
+      title="My Profile"
+      description="Maintain the official scholarship record used for status updates, eligibility review, and office coordination."
+      onSignOut={handleSignOut}
+      actions={
+        application ? (
+          editing ? (
             <>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="surface p-4 sm:p-6"
-              >
-                <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start">
-                  <div className="relative self-center sm:self-auto">
-                    <div
-                      className="w-24 h-24 sm:w-28 sm:h-28 rounded-lg flex items-center justify-center"
-                      style={{ background: "var(--green-deep)", color: "white" }}
-                    >
-                      <User className="w-10 h-10 sm:w-12 sm:h-12" />
-                    </div>
-                    {editing && (
-                      <div 
-                        className="absolute -bottom-1 -right-1 w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center cursor-pointer"
-                        style={{ background: "var(--cream)", color: "var(--green-deep)" }}
-                      >
-                        <Camera className="w-3 h-3 sm:w-4 sm:h-4" />
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="flex-1 w-full space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                      <div className="space-y-1">
-                        <p className="value-label">Full Name</p>
-                        {editing ? (
-                          <div className="flex flex-col sm:flex-row gap-2">
-                            <input
-                              name="firstName"
-                              value={formData.firstName}
-                              onChange={handleChange}
-                              className="field-control flex-1 px-3 py-2 text-sm sm:text-base"
-                              placeholder="First Name"
-                            />
-                            <input
-                              name="lastName"
-                              value={formData.lastName}
-                              onChange={handleChange}
-                              className="field-control flex-1 px-3 py-2 text-sm sm:text-base"
-                              placeholder="Last Name"
-                            />
-                          </div>
-                        ) : (
-                          <p className="font-semibold text-lg" style={{ color: "var(--green-deep)" }}>
-                            {application.firstName} {application.lastName}
-                          </p>
-                        )}
-                      </div>
-                      <div className="space-y-1">
-                        <p className="value-label">Status</p>
-                        <span
-                          className="inline-flex px-3 py-1 rounded-full text-sm font-medium capitalize"
-                          style={{ 
-                            background: getStatusColor(application.status).bg, 
-                            color: getStatusColor(application.status).text 
-                          }}
-                        >
-                          {application.status.replace("_", " ")}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                      <div className="space-y-1">
-                        <p className="value-label">Email</p>
-                        <p className="font-medium" style={{ color: "var(--green-deep)" }}>{application.email}</p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="value-label">Application ID</p>
-                        <p className="font-medium font-mono" style={{ color: "var(--green-deep)" }}>{application.applicationId}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="surface p-4 sm:p-6"
-              >
-                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: "var(--green-deep)" }}>
-                  <Users className="w-5 h-5" /> Personal Information
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                  <div className="space-y-1">
-                    <p className="value-label flex items-center gap-1">
-                      <Phone className="w-3 h-3" /> Phone
-                    </p>
-                    {editing ? (
-                      <input
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        className="field-control px-3 py-2"
-                      />
-                    ) : (
-                      <p className="font-medium" style={{ color: "var(--green-deep)" }}>{application.phone}</p>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <p className="value-label flex items-center gap-1">
-                      <Calendar className="w-3 h-3" /> Date of Birth
-                    </p>
-                    {editing ? (
-                      <input
-                        name="birthday"
-                        type="date"
-                        value={formData.birthday || ""}
-                        onChange={handleChange}
-                        className="field-control px-3 py-2"
-                      />
-                    ) : (
-                      <p className="font-medium" style={{ color: "var(--green-deep)" }}>
-                        {application.birthday || "—"}
-                      </p>
-                    )}
-                  </div>
-                  <div className="sm:col-span-2 space-y-1">
-                    <p className="value-label flex items-center gap-1">
-                      <MapPin className="w-3 h-3" /> Address
-                    </p>
-                    {editing ? (
-                      <textarea
-                        name="address"
-                        value={formData.address}
-                        onChange={handleChange}
-                        rows={2}
-                        className="field-control px-3 py-2"
-                      />
-                    ) : (
-                      <p className="font-medium" style={{ color: "var(--green-deep)" }}>{application.address}</p>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="surface p-4 sm:p-6"
-              >
-                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: "var(--green-deep)" }}>
-                  <GraduationCap className="w-5 h-5" /> Educational Background
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                  <div className="space-y-1">
-                    <p className="value-label flex items-center gap-1">
-                      <Book className="w-3 h-3" /> School
-                    </p>
-                    {editing ? (
-                      <input
-                        name="schoolName"
-                        value={formData.schoolName}
-                        onChange={handleChange}
-                        className="field-control px-3 py-2"
-                      />
-                    ) : (
-                      <p className="font-medium" style={{ color: "var(--green-deep)" }}>{application.schoolName}</p>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <p className="value-label flex items-center gap-1">
-                      <Book className="w-3 h-3" /> Course
-                    </p>
-                    {editing ? (
-                      <input
-                        name="course"
-                        value={formData.course}
-                        onChange={handleChange}
-                        className="field-control px-3 py-2"
-                      />
-                    ) : (
-                      <p className="font-medium" style={{ color: "var(--green-deep)" }}>{application.course}</p>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <p className="value-label flex items-center gap-1">
-                      <Award className="w-3 h-3" /> Year Level
-                    </p>
-                    {editing ? (
-                      <select
-                        name="yearLevel"
-                        value={formData.yearLevel}
-                        onChange={handleChange}
-                        className="field-control px-3 py-2"
-                      >
-                        <option value={1}>1st Year</option>
-                        <option value={2}>2nd Year</option>
-                        <option value={3}>3rd Year</option>
-                        <option value={4}>4th Year</option>
-                        <option value={5}>5th Year</option>
-                      </select>
-                    ) : (
-                      <p className="font-medium" style={{ color: "var(--green-deep)" }}>
-                        {application.yearLevel}{["st", "nd", "rd", "th", "th"][application.yearLevel - 1]} Year
-                      </p>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <p className="value-label flex items-center gap-1">
-                      <Award className="w-3 h-3" /> GWA
-                    </p>
-                    {editing ? (
-                      <input
-                        name="gwa"
-                        value={formData.gwa}
-                        onChange={handleChange}
-                        className="field-control px-3 py-2"
-                      />
-                    ) : (
-                      <p className="font-medium" style={{ color: "var(--green-deep)" }}>{application.gwa}</p>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="surface p-4 sm:p-6"
-              >
-                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: "var(--green-deep)" }}>
-                  <Users className="w-5 h-5" /> Parent / Guardian Information
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                  <div className="space-y-1">
-                    <p className="value-label">Parent / Guardian Name</p>
-                    {editing ? (
-                      <input
-                        name="guardianName"
-                        value={formData.guardianName || ""}
-                        onChange={handleChange}
-                        className="field-control px-3 py-2"
-                        placeholder="Enter parent/guardian name"
-                      />
-                    ) : (
-                      <p className="font-medium" style={{ color: "var(--green-deep)" }}>
-                        {application.guardianName || "—"}
-                      </p>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <p className="value-label">Parent / Guardian Phone</p>
-                    {editing ? (
-                      <input
-                        name="guardianPhone"
-                        value={formData.guardianPhone || ""}
-                        onChange={handleChange}
-                        className="field-control px-3 py-2"
-                        placeholder="09XX XXX XXXX"
-                      />
-                    ) : (
-                      <p className="font-medium" style={{ color: "var(--green-deep)" }}>
-                        {application.guardianPhone || "—"}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
+              <button onClick={handleCancel} className="btn-secondary px-5 py-3 text-sm" disabled={saving}>
+                <X className="h-4 w-4" />
+                Cancel
+              </button>
+              <button onClick={handleSave} className="btn-primary px-5 py-3 text-sm" disabled={saving}>
+                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                Save Record
+              </button>
             </>
           ) : (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="surface p-8 sm:p-12 text-center"
+            <button onClick={() => setEditing(true)} className="btn-primary px-5 py-3 text-sm">
+              Edit Record
+            </button>
+          )
+        ) : (
+          <Link href="/apply" className="btn-primary px-5 py-3 text-sm">
+            Start Application
+          </Link>
+        )
+      }
+    >
+      {application && formData ? (
+        <div className="grid gap-5 xl:grid-cols-[0.9fr_1.35fr]">
+          <motion.aside
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-5"
+          >
+            <section className="surface overflow-hidden">
+              <div className="bg-[var(--green-deep)] p-6 text-[var(--cream)]">
+                <div className="mb-5 flex items-start justify-between gap-3">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/12 text-xl font-bold ring-1 ring-white/15">
+                    {getInitials(`${application.firstName} ${application.lastName}`)}
+                  </div>
+                  <span className="rounded-full bg-white/12 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em]">
+                    San Pablo Scholar
+                  </span>
+                </div>
+                <p className="value-label mb-2 text-white/56">Scholar Identity</p>
+                <h2 className="font-display text-4xl font-bold leading-none">
+                  {application.firstName} {application.lastName}
+                </h2>
+                <p className="mt-3 font-mono text-sm text-white/70">{application.applicationId}</p>
+              </div>
+              <div className="space-y-4 p-5">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="value-label mb-1">Status</p>
+                    <p className="font-semibold text-[var(--green-deep)]">{status.label}</p>
+                  </div>
+                  <span
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-xl"
+                    style={{ background: status.bg, color: status.text }}
+                  >
+                    <StatusIcon className="h-5 w-5" />
+                  </span>
+                </div>
+                <div>
+                  <div className="mb-2 flex items-center justify-between text-sm">
+                    <span className="font-semibold text-[var(--green-deep)]">Profile completeness</span>
+                    <span className="font-bold text-[var(--green-mid)]">{completeness.percent}%</span>
+                  </div>
+                  <div className="h-2 overflow-hidden rounded-full bg-[var(--sand-soft)]">
+                    <div className="h-full rounded-full bg-[var(--green-deep)]" style={{ width: `${completeness.percent}%` }} />
+                  </div>
+                  <p className="mt-2 text-xs text-[var(--muted)]">
+                    {completeness.completed} of {completeness.total} core fields complete.
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            <section className="surface p-5">
+              <p className="value-label mb-4">Application Snapshot</p>
+              <div className="space-y-4">
+                <SnapshotRow icon={CalendarDays} label="Submitted" value={formatDate(application.submittedAt)} />
+                <SnapshotRow icon={GraduationCap} label="Year Level" value={formatYearLevel(application.yearLevel)} />
+                <SnapshotRow icon={Award} label="Latest GWA" value={application.gwa} />
+              </div>
+            </section>
+
+            <section className="surface p-5">
+              <p className="value-label mb-1">Document Readiness</p>
+              <p className="mb-4 text-xs leading-relaxed text-[var(--muted)]">
+                Tick what you have ready. Upload not enabled yet — bring originals to the office.
+              </p>
+              <div className="space-y-2">
+                {DOCUMENT_REQUIREMENTS.map((doc) => {
+                  const checked = checkedDocs.has(doc);
+                  return (
+                    <button
+                      key={doc}
+                      type="button"
+                      onClick={() =>
+                        setCheckedDocs((prev) => {
+                          const next = new Set(prev);
+                          checked ? next.delete(doc) : next.add(doc);
+                          return next;
+                        })
+                      }
+                      className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors"
+                      style={{
+                        background: checked ? "rgba(45,106,79,0.08)" : "var(--cream)",
+                        border: `1px solid ${checked ? "rgba(45,106,79,0.25)" : "transparent"}`,
+                      }}
+                    >
+                      <CheckCircle2
+                        className="h-4 w-4 shrink-0 transition-colors"
+                        style={{ color: checked ? "var(--green-mid)" : "var(--sand)" }}
+                      />
+                      <span
+                        className="text-sm font-medium transition-colors"
+                        style={{ color: checked ? "var(--green-deep)" : "var(--muted)" }}
+                      >
+                        {doc}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+              {checkedDocs.size > 0 && (
+                <p className="mt-3 text-xs font-semibold" style={{ color: "var(--green-mid)" }}>
+                  {checkedDocs.size} of {DOCUMENT_REQUIREMENTS.length} documents marked ready
+                </p>
+              )}
+            </section>
+          </motion.aside>
+
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.08 }}
+            className="space-y-5"
+          >
+            {saveError && (
+              <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+                {saveError}
+              </div>
+            )}
+
+            <RecordSection
+              icon={User}
+              title="Personal Information"
+              description="Primary contact details used by scholarship staff."
             >
-              <FileText className="w-16 h-16 mx-auto mb-4" style={{ color: "var(--muted)" }} />
-              <p className="font-medium text-lg mb-2" style={{ color: "var(--green-deep)" }}>
-                No Application Found
-              </p>
-              <p className="text-sm mb-6" style={{ color: "var(--muted)" }}>
-                You haven&apos;t submitted an application yet.
-              </p>
-              <Link
-                href="/apply"
-                className="btn-primary inline-flex items-center gap-2 px-6 py-3 font-medium"
-              >
-                Apply Now
-              </Link>
-            </motion.div>
-          )}
+              <div className="grid gap-4 md:grid-cols-2">
+                <Field label="First Name">
+                  {editing ? (
+                    <input name="firstName" value={formData.firstName} onChange={handleChange} className="field-control px-3 py-2.5" />
+                  ) : (
+                    <ReadValue value={application.firstName} />
+                  )}
+                </Field>
+                <Field label="Last Name">
+                  {editing ? (
+                    <input name="lastName" value={formData.lastName} onChange={handleChange} className="field-control px-3 py-2.5" />
+                  ) : (
+                    <ReadValue value={application.lastName} />
+                  )}
+                </Field>
+                <Field label="Email" icon={Mail}>
+                  <ReadValue value={application.email} />
+                </Field>
+                <Field label="Mobile Number" icon={Phone}>
+                  {editing ? (
+                    <input name="phone" value={formData.phone} onChange={handleChange} className="field-control px-3 py-2.5" />
+                  ) : (
+                    <ReadValue value={application.phone} />
+                  )}
+                </Field>
+                <Field label="San Pablo Address" icon={MapPin} wide>
+                  {editing ? (
+                    <textarea
+                      name="address"
+                      value={formData.address}
+                      onChange={handleChange}
+                      rows={3}
+                      className="field-control px-3 py-2.5"
+                    />
+                  ) : (
+                    <ReadValue value={application.address} />
+                  )}
+                </Field>
+              </div>
+            </RecordSection>
+
+            <RecordSection
+              icon={BookOpen}
+              title="Educational Background"
+              description="School details used for eligibility review."
+            >
+              <div className="grid gap-4 md:grid-cols-2">
+                <Field label="School / University">
+                  {editing ? (
+                    <input name="schoolName" value={formData.schoolName} onChange={handleChange} className="field-control px-3 py-2.5" />
+                  ) : (
+                    <ReadValue value={application.schoolName} />
+                  )}
+                </Field>
+                <Field label="Course / Program">
+                  {editing ? (
+                    <input name="course" value={formData.course} onChange={handleChange} className="field-control px-3 py-2.5" />
+                  ) : (
+                    <ReadValue value={application.course} />
+                  )}
+                </Field>
+                <Field label="Year Level">
+                  {editing ? (
+                    <select name="yearLevel" value={formData.yearLevel} onChange={handleChange} className="field-control px-3 py-2.5">
+                      <option value={1}>1st Year</option>
+                      <option value={2}>2nd Year</option>
+                      <option value={3}>3rd Year</option>
+                      <option value={4}>4th Year</option>
+                      <option value={5}>5th Year</option>
+                    </select>
+                  ) : (
+                    <ReadValue value={formatYearLevel(application.yearLevel)} />
+                  )}
+                </Field>
+                <Field label="Latest GWA">
+                  {editing ? (
+                    <input name="gwa" value={formData.gwa} onChange={handleChange} className="field-control px-3 py-2.5" />
+                  ) : (
+                    <ReadValue value={application.gwa} />
+                  )}
+                </Field>
+              </div>
+            </RecordSection>
+
+            <RecordSection
+              icon={Users}
+              title="Family Background"
+              description="Household income and guardian details used for eligibility assessment."
+            >
+              <div className="grid gap-4 md:grid-cols-2">
+                <Field label="Monthly Household Income">
+                  {editing ? (
+                    <select name="monthlyIncome" value={formData.monthlyIncome ?? ""} onChange={handleChange} className="field-control px-3 py-2.5">
+                      <option value="">Select income range...</option>
+                      {INCOME_OPTIONS.map((o) => (
+                        <option key={o.value} value={o.value}>{o.label}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <ReadValue value={INCOME_LABELS[application.monthlyIncome ?? ""] ?? "Not recorded"} />
+                  )}
+                </Field>
+                <Field label="Number of Siblings">
+                  {editing ? (
+                    <input
+                      type="number"
+                      name="numberOfSiblings"
+                      value={formData.numberOfSiblings ?? ""}
+                      onChange={handleChange}
+                      min={0}
+                      max={20}
+                      className="field-control px-3 py-2.5"
+                    />
+                  ) : (
+                    <ReadValue value={application.numberOfSiblings != null ? String(application.numberOfSiblings) : "Not recorded"} />
+                  )}
+                </Field>
+                <Field label="Guardian Occupation">
+                  {editing ? (
+                    <input name="guardianOccupation" value={formData.guardianOccupation ?? ""} onChange={handleChange} className="field-control px-3 py-2.5" placeholder="e.g. Farmer, Vendor, Driver" />
+                  ) : (
+                    <ReadValue value={application.guardianOccupation || "Not recorded"} />
+                  )}
+                </Field>
+                <Field label="Employment Status">
+                  {editing ? (
+                    <select name="guardianEmploymentStatus" value={formData.guardianEmploymentStatus ?? ""} onChange={handleChange} className="field-control px-3 py-2.5">
+                      <option value="">Select status...</option>
+                      {EMPLOYMENT_OPTIONS.map((o) => (
+                        <option key={o.value} value={o.value}>{o.label}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <ReadValue value={EMPLOYMENT_LABELS[application.guardianEmploymentStatus ?? ""] ?? "Not recorded"} />
+                  )}
+                </Field>
+              </div>
+            </RecordSection>
+
+            <RecordSection
+              icon={FileText}
+              title="Workflow Notes"
+              description="Transparent v1 boundaries so users do not assume unsupported upload state."
+            >
+              <div className="grid gap-3 md:grid-cols-2">
+                <WorkflowNote title="Status source" body="Status comes from existing scholarship application record." />
+                <WorkflowNote title="Documents" body="Dashboard shows required list only; no files are stored in this release." />
+                <WorkflowNote title="Workspace" body="Dashboard and profile use one consistent scholar workspace." />
+                <WorkflowNote title="Office updates" body="Keep contact and school details current for committee follow-up." />
+              </div>
+            </RecordSection>
+          </motion.div>
         </div>
-      </motion.main>
+      ) : (
+        <motion.section
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="surface mx-auto max-w-3xl p-8 text-center sm:p-12"
+        >
+          <FileText className="mx-auto mb-5 h-16 w-16 text-[var(--muted)]" />
+          <p className="eyebrow mb-3">No San Pablo Scholar Record</p>
+          <h2 className="font-display text-4xl font-bold text-[var(--green-deep)]">No application found</h2>
+          <p className="lead mx-auto mt-3 max-w-lg text-sm">
+            Submit an application first. Your profile hub will appear once a scholarship record exists.
+          </p>
+          <Link href="/apply" className="btn-primary mt-8 px-7 py-3">
+            Start Application
+          </Link>
+        </motion.section>
+      )}
+    </ScholarShell>
+  );
+}
+
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+}
+
+function SnapshotRow({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="flex items-start gap-3">
+      <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--cream)] text-[var(--green-mid)]">
+        <Icon className="h-4 w-4" />
+      </span>
+      <div>
+        <p className="value-label">{label}</p>
+        <p className="text-sm font-semibold text-[var(--green-deep)]">{value}</p>
+      </div>
+    </div>
+  );
+}
+
+function RecordSection({
+  icon: Icon,
+  title,
+  description,
+  children,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  description: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="surface p-5 sm:p-6">
+      <div className="mb-5 flex items-start gap-3">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--cream)] text-[var(--green-mid)]">
+          <Icon className="h-5 w-5" />
+        </span>
+        <div>
+          <h2 className="font-display text-2xl font-bold leading-none text-[var(--green-deep)]">{title}</h2>
+          <p className="mt-2 text-sm text-[var(--muted)]">{description}</p>
+        </div>
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function Field({
+  label,
+  icon: Icon,
+  wide = false,
+  children,
+}: {
+  label: string;
+  icon?: React.ComponentType<{ className?: string }>;
+  wide?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className={wide ? "md:col-span-2" : ""}>
+      <p className="value-label mb-2 flex items-center gap-1.5">
+        {Icon && <Icon className="h-3.5 w-3.5" />}
+        {label}
+      </p>
+      {children}
+    </div>
+  );
+}
+
+function ReadValue({ value }: { value: string }) {
+  return <p className="rounded-xl bg-[var(--cream)] px-3 py-2.5 font-semibold text-[var(--green-deep)]">{value}</p>;
+}
+
+function WorkflowNote({ title, body }: { title: string; body: string }) {
+  return (
+    <div className="rounded-xl border border-[var(--sand-soft)] bg-[var(--cream)] p-4">
+      <p className="font-semibold text-[var(--green-deep)]">{title}</p>
+      <p className="mt-1 text-sm leading-relaxed text-[var(--muted)]">{body}</p>
     </div>
   );
 }

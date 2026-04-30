@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Loader2 } from "lucide-react";
+import { Search, Loader2, FileSearch, Clock3, ShieldCheck } from "lucide-react";
 
 type ApplicationResult = {
   applicationId: string;
@@ -59,16 +59,25 @@ export default function TrackPage() {
 
   return (
     <main className="page-shell pt-32 pb-24">
-      <div className="narrow-container">
+      <div className="page-container">
 
-        <section className="mb-12 text-center section-divider pt-10">
-          <p className="eyebrow mb-4">Application Status</p>
-          <h1 className="page-title text-5xl md:text-6xl mb-5">
-            Track Your Application
-          </h1>
-          <p className="lead text-base">
-            Enter your reference code to check your current application status.
-          </p>
+        <section className="mb-10 grid gap-8 section-divider pt-10 lg:grid-cols-[1fr_0.85fr] lg:items-end">
+          <div>
+            <p className="eyebrow mb-4">Application Status</p>
+            <h1 className="page-title text-5xl md:text-7xl mb-5">
+              Track Your Application
+            </h1>
+            <p className="lead text-base max-w-xl">
+              Enter your reference code to check your current scholarship status from the official application record.
+            </p>
+          </div>
+          <div className="surface p-5">
+            <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+              <MiniStatus icon={FileSearch} title="Find record" body="Use SPC reference code." />
+              <MiniStatus icon={Clock3} title="See status" body="Pending, review, approved, or rejected." />
+              <MiniStatus icon={ShieldCheck} title="Official source" body="Data comes from scholarship office records." />
+            </div>
+          </div>
         </section>
 
         <section className="surface p-6 md:p-8 mb-8">
@@ -98,7 +107,7 @@ export default function TrackPage() {
           {result && (
             <div className="mt-8 pt-8 border-t" style={{ borderColor: "var(--sand)" }}>
               <p className="value-label mb-4">Result for &ldquo;{result.applicationId}&rdquo;</p>
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-lg"
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl"
                 style={{ background: "var(--cream)", border: "1px solid var(--sand)" }}>
                 <div>
                   <p className="font-display text-lg font-semibold" style={{ color: "var(--green-deep)" }}>
@@ -131,11 +140,33 @@ export default function TrackPage() {
           )}
         </section>
 
-        <p className="font-mono text-xs text-center tracking-wider" style={{ color: "var(--muted)" }}>
-          Reference codes follow the format SPC-XXXXXX. Check your email for your code.
-        </p>
+        <div className="surface-muted p-5 text-center">
+          <p className="font-mono text-xs tracking-wider" style={{ color: "var(--muted)" }}>
+            Reference codes follow the format SPC-XXXXXX. Check your email for your code.
+          </p>
+        </div>
 
       </div>
     </main>
+  );
+}
+
+function MiniStatus({
+  icon: Icon,
+  title,
+  body,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  body: string;
+}) {
+  return (
+    <div className="flex items-start gap-3 rounded-xl bg-[var(--cream)] p-3">
+      <Icon className="mt-0.5 h-4 w-4 shrink-0 text-[var(--green-mid)]" />
+      <div>
+        <p className="text-sm font-semibold text-[var(--green-deep)]">{title}</p>
+        <p className="text-xs text-[var(--muted)]">{body}</p>
+      </div>
+    </div>
   );
 }
