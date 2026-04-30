@@ -24,8 +24,8 @@ echo "==> [4/4] Create .env"
 cat > $APP_DIR/.env << 'ENVEOF'
 DATABASE_URL=postgresql://scholarship_admin:<password>@localhost:5432/scholarship_db
 BETTER_AUTH_SECRET=<run: openssl rand -base64 32>
-BETTER_AUTH_URL=https://scholarship.spc.igat.com.ph
-NEXT_PUBLIC_BETTER_AUTH_URL=https://scholarship.spc.igat.com.ph
+BETTER_AUTH_URL=https://scholarship.igat.com.ph
+NEXT_PUBLIC_BETTER_AUTH_URL=https://scholarship.igat.com.ph
 ENVEOF
 echo "    !! Fill in .env values at $APP_DIR/.env before proceeding !!"
 
@@ -39,7 +39,7 @@ echo "==> Next steps (cloudflare tunnel — Docker):"
 echo "    1. cloudflared tunnel login"
 echo "    2. cloudflared tunnel create scholarship"
 echo "         -> copy the tunnel ID into ~/.cloudflared/config.yml"
-echo "    3. cloudflared tunnel route dns scholarship scholarship.spc.igat.com.ph"
+echo "    3. cloudflared tunnel route dns scholarship scholarship.igat.com.ph"
 echo "    4. cp $APP_DIR/.cloudflared/config.yml ~/.cloudflared/config.yml"
 echo "         -> fill in your tunnel ID"
 echo "    5. docker compose -f $APP_DIR/docker-compose.tunnel.yml up -d"
