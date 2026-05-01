@@ -15,6 +15,27 @@
       "when": 1777529874329,
       "tag": "0001_fearless_whiplash",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1777535635596,
+      "tag": "0002_cloudy_dark_phoenix",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1777552514477,
+      "tag": "0003_overjoyed_slipstream",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1777554377585,
+      "tag": "0004_outgoing_chameleon",
+      "breakpoints": true
     }
   ]
 }

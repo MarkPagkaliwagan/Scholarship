@@ -7,6 +7,7 @@ import {
   FileText,
   GraduationCap,
   Home,
+  Key,
   LogOut,
   User,
   type LucideIcon,
@@ -31,6 +32,7 @@ const scholarNav: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
   { href: "/apply", label: "Apply", icon: FileText },
   { href: "/profile", label: "My Profile", icon: User },
+  { href: "/account", label: "Account Settings", icon: Key },
 ];
 
 export default function ScholarShell({
@@ -149,7 +151,7 @@ export default function ScholarShell({
           paddingBottom: "env(safe-area-inset-bottom)",
         }}
       >
-        <div className="grid grid-cols-3 px-3 py-2">
+        <div className="grid grid-cols-5 px-3 py-2">
           {scholarNav.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;

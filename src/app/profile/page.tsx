@@ -19,6 +19,8 @@ import {
   User,
   Users,
   X,
+  ExternalLink,
+  Download,
 } from "lucide-react";
 import { INCOME_LABELS, INCOME_OPTIONS, EMPLOYMENT_LABELS, EMPLOYMENT_OPTIONS } from "@/lib/scholarship-ui";
 import ScholarShell from "@/components/ScholarShell";
@@ -47,6 +49,9 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [checkedDocs, setCheckedDocs] = useState<Set<string>>(new Set());
+  const [documents, setDocuments] = useState<any[]>([]);
+  const [loadingDocs, setLoadingDocs] = useState(false);
+  const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -67,6 +72,20 @@ export default function ProfilePage() {
           const currentApplication = applications[0] ?? null;
           setApplication(currentApplication);
           setFormData(currentApplication);
+
+          if (currentApplication) {
+            setLoadingDocs(true);
+            const docsResponse = await fetch("/api/applications/documents");
+            if (docsResponse.ok) {
+              const docs = await docsResponse.json();
+              setDocuments(docs);
+              const photoDoc = docs.find((d: any) => d.documentName?.toLowerCase().includes("photo"));
+              if (photoDoc?.filePath) {
+                setProfilePhoto(photoDoc.filePath);
+              }
+            }
+            setLoadingDocs(false);
+          }
         }
       } finally {
         setLoading(false);
@@ -147,6 +166,62 @@ export default function ProfilePage() {
   const StatusIcon = status.icon;
   const completeness = getProfileCompleteness(application);
 
+  const SnapshotRow = ({ icon: Icon, label, value }: any) => {
+    return (
+      <div className="flex items-start gap-3">
+        <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--cream)] text-[var(--green-mid)]">
+          <Icon className="h-4 w-4" />
+        </span>
+        <div>
+          <p className="value-label">{label}</p>
+          <p className="text-sm font-semibold text-[var(--green-deep)]">{value}</p>
+        </div>
+      </div>
+    );
+  };
+
+  const RecordSection = ({ icon: Icon, title, description, children }: any) => {
+    return (
+      <section className="surface p-5 sm:p-6">
+        <div className="mb-5 flex items-start gap-3">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--cream)] text-[var(--green-mid)]">
+            <Icon className="h-5 w-5" />
+          </span>
+          <div>
+            <h2 className="font-display text-2xl font-bold leading-none text-[var(--green-deep)]">{title}</h2>
+            <p className="mt-2 text-sm text-[var(--muted)]">{description}</p>
+          </div>
+        </div>
+        {children}
+      </section>
+    );
+  };
+
+  const Field = ({ label, icon: Icon, wide = false, children }: any) => {
+    return (
+      <div className={wide ? "md:col-span-2" : ""}>
+        <p className="value-label mb-2 flex items-center gap-1.5">
+          {Icon && <Icon className="h-3.5 w-3.5" />}
+          {label}
+        </p>
+        {children}
+      </div>
+    );
+  };
+
+  const ReadValue = ({ value }: { value: string }) => {
+    return <p className="rounded-xl bg-[var(--cream)] px-3 py-2.5 font-semibold text-[var(--green-deep)]">{value}</p>;
+  };
+
+  const WorkflowNote = ({ title, body }: { title: string; body: string }) => {
+    return (
+      <div className="rounded-xl border border-[var(--sand-soft)] bg-[var(--cream)] p-4">
+        <p className="font-semibold text-[var(--green-deep)]">{title}</p>
+        <p className="mt-1 text-sm leading-relaxed text-[var(--muted)]">{body}</p>
+      </div>
+    );
+  };
+
   return (
     <ScholarShell
       user={user}
@@ -189,9 +264,17 @@ export default function ProfilePage() {
             <section className="surface overflow-hidden">
               <div className="bg-[var(--green-deep)] p-6 text-[var(--cream)]">
                 <div className="mb-5 flex items-start justify-between gap-3">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/12 text-xl font-bold ring-1 ring-white/15">
-                    {getInitials(`${application.firstName} ${application.lastName}`)}
-                  </div>
+                  {profilePhoto ? (
+                    <img 
+                      src={profilePhoto} 
+                      alt="Profile" 
+                      className="h-16 w-16 rounded-2xl object-cover ring-2 ring-white/30" 
+                    />
+                  ) : (
+                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/12 text-xl font-bold ring-1 ring-white/15">
+                      {application.firstName?.[0]}{application.lastName?.[0]}
+                    </div>
+                  )}
                   <span className="rounded-full bg-white/12 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em]">
                     San Pablo Scholar
                   </span>
@@ -240,49 +323,52 @@ export default function ProfilePage() {
             </section>
 
             <section className="surface p-5">
-              <p className="value-label mb-1">Document Readiness</p>
+              <p className="value-label mb-1">Document Status</p>
               <p className="mb-4 text-xs leading-relaxed text-[var(--muted)]">
-                Tick what you have ready. Upload not enabled yet — bring originals to the office.
+                Overview of your submitted documents.
               </p>
               <div className="space-y-2">
-                {DOCUMENT_REQUIREMENTS.map((doc) => {
-                  const checked = checkedDocs.has(doc);
+                {[
+                  { name: "Certificate of Residency", key: "residency" },
+                  { name: "School ID / Enrollment Certificate", key: "school" },
+                  { name: "Valid Government ID", key: "gov" },
+                  { name: "Recent 2x2 Photo", key: "photo" },
+                ].map((doc) => {
+                  const uploadedDoc = documents.find((d: any) => 
+                    d.documentName?.toLowerCase().includes(doc.key)
+                  );
+                  const isUploaded = !!uploadedDoc;
                   return (
-                    <button
-                      key={doc}
-                      type="button"
-                      onClick={() =>
-                        setCheckedDocs((prev) => {
-                          const next = new Set(prev);
-                          checked ? next.delete(doc) : next.add(doc);
-                          return next;
-                        })
-                      }
-                      className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors"
+                    <div
+                      key={doc.key}
+                      className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5"
                       style={{
-                        background: checked ? "rgba(45,106,79,0.08)" : "var(--cream)",
-                        border: `1px solid ${checked ? "rgba(45,106,79,0.25)" : "transparent"}`,
+                        background: isUploaded ? "rgba(45,106,79,0.08)" : "var(--cream)",
+                        border: `1px solid ${isUploaded ? "rgba(45,106,79,0.25)" : "var(--sand-soft)"}`,
                       }}
                     >
                       <CheckCircle2
-                        className="h-4 w-4 shrink-0 transition-colors"
-                        style={{ color: checked ? "var(--green-mid)" : "var(--sand)" }}
+                        className="h-4 w-4 shrink-0"
+                        style={{ color: isUploaded ? "#16a34a" : "var(--sand)" }}
                       />
                       <span
-                        className="text-sm font-medium transition-colors"
-                        style={{ color: checked ? "var(--green-deep)" : "var(--muted)" }}
+                        className="text-sm font-medium"
+                        style={{ color: isUploaded ? "var(--green-deep)" : "var(--muted)" }}
                       >
-                        {doc}
+                        {doc.name}
                       </span>
-                    </button>
+                      {isUploaded && (
+                        <span className="ml-auto text-xs px-2 py-1 rounded" style={{ background: "#dcfce7", color: "#166534" }}>
+                          Uploaded
+                        </span>
+                      )}
+                    </div>
                   );
                 })}
               </div>
-              {checkedDocs.size > 0 && (
-                <p className="mt-3 text-xs font-semibold" style={{ color: "var(--green-mid)" }}>
-                  {checkedDocs.size} of {DOCUMENT_REQUIREMENTS.length} documents marked ready
-                </p>
-              )}
+              <p className="mt-3 text-xs font-semibold" style={{ color: "var(--green-mid)" }}>
+                {documents.length} of {4} documents uploaded
+              </p>
             </section>
           </motion.aside>
 
@@ -444,12 +530,74 @@ export default function ProfilePage() {
 
             <RecordSection
               icon={FileText}
+              title="Uploaded Documents"
+              description="View all documents you have submitted for your scholarship application."
+            >
+              {loadingDocs ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-[var(--green-mid)]" />
+                </div>
+              ) : documents.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b" style={{ borderColor: "var(--sand)" }}>
+                        <th className="text-left p-3 text-xs font-medium" style={{ color: "var(--muted)" }}>Document</th>
+                        <th className="text-left p-3 text-xs font-medium" style={{ color: "var(--muted)" }}>File Name</th>
+                        <th className="text-left p-3 text-xs font-medium" style={{ color: "var(--muted)" }}>Size</th>
+                        <th className="text-left p-3 text-xs font-medium" style={{ color: "var(--muted)" }}>Status</th>
+                        <th className="text-center p-3 text-xs font-medium" style={{ color: "var(--muted)" }}>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {documents.map((doc) => (
+                        <tr key={doc.id} className="border-b" style={{ borderColor: "var(--sand-soft)" }}>
+                          <td className="p-3 font-medium" style={{ color: "var(--green-deep)" }}>{doc.documentName}</td>
+                          <td className="p-3 truncate max-w-[200px]" style={{ color: "var(--muted)" }}>{doc.fileName || "—"}</td>
+                          <td className="p-3" style={{ color: "var(--muted)" }}>
+                            {doc.fileSize ? `${(doc.fileSize / 1024).toFixed(1)} KB` : "—"}
+                          </td>
+                          <td className="p-3">
+                            <span 
+                              className="inline-block px-2 py-1 rounded text-xs font-medium"
+                              style={{ 
+                                background: doc.status === 'approved' ? '#dcfce7' : doc.status === 'rejected' ? '#fee2e2' : '#fef3c7',
+                                color: doc.status === 'approved' ? '#166534' : doc.status === 'rejected' ? '#991b1b' : '#92400e'
+                              }}
+                            >
+                              {doc.status}
+                            </span>
+                          </td>
+                          <td className="p-3 text-center">
+                            {doc.filePath && (
+                              <a 
+                                href={doc.filePath} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-[var(--green-deep)] hover:underline text-xs"
+                              >
+                                <ExternalLink className="h-3 w-3" /> View
+                              </a>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="text-sm text-[var(--muted)] py-4">No documents uploaded yet.</p>
+              )}
+            </RecordSection>
+
+            <RecordSection
+              icon={FileText}
               title="Workflow Notes"
-              description="Transparent v1 boundaries so users do not assume unsupported upload state."
+              description="Important information about your scholarship application process."
             >
               <div className="grid gap-3 md:grid-cols-2">
                 <WorkflowNote title="Status source" body="Status comes from existing scholarship application record." />
-                <WorkflowNote title="Documents" body="Dashboard shows required list only; no files are stored in this release." />
+                <WorkflowNote title="Documents" body="Uploaded documents are stored and can be viewed in the Documents section." />
                 <WorkflowNote title="Workspace" body="Dashboard and profile use one consistent scholar workspace." />
                 <WorkflowNote title="Office updates" body="Keep contact and school details current for committee follow-up." />
               </div>
@@ -474,99 +622,5 @@ export default function ProfilePage() {
         </motion.section>
       )}
     </ScholarShell>
-  );
-}
-
-function getInitials(name: string) {
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .map((part) => part[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
-
-function SnapshotRow({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="flex items-start gap-3">
-      <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--cream)] text-[var(--green-mid)]">
-        <Icon className="h-4 w-4" />
-      </span>
-      <div>
-        <p className="value-label">{label}</p>
-        <p className="text-sm font-semibold text-[var(--green-deep)]">{value}</p>
-      </div>
-    </div>
-  );
-}
-
-function RecordSection({
-  icon: Icon,
-  title,
-  description,
-  children,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  title: string;
-  description: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="surface p-5 sm:p-6">
-      <div className="mb-5 flex items-start gap-3">
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--cream)] text-[var(--green-mid)]">
-          <Icon className="h-5 w-5" />
-        </span>
-        <div>
-          <h2 className="font-display text-2xl font-bold leading-none text-[var(--green-deep)]">{title}</h2>
-          <p className="mt-2 text-sm text-[var(--muted)]">{description}</p>
-        </div>
-      </div>
-      {children}
-    </section>
-  );
-}
-
-function Field({
-  label,
-  icon: Icon,
-  wide = false,
-  children,
-}: {
-  label: string;
-  icon?: React.ComponentType<{ className?: string }>;
-  wide?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className={wide ? "md:col-span-2" : ""}>
-      <p className="value-label mb-2 flex items-center gap-1.5">
-        {Icon && <Icon className="h-3.5 w-3.5" />}
-        {label}
-      </p>
-      {children}
-    </div>
-  );
-}
-
-function ReadValue({ value }: { value: string }) {
-  return <p className="rounded-xl bg-[var(--cream)] px-3 py-2.5 font-semibold text-[var(--green-deep)]">{value}</p>;
-}
-
-function WorkflowNote({ title, body }: { title: string; body: string }) {
-  return (
-    <div className="rounded-xl border border-[var(--sand-soft)] bg-[var(--cream)] p-4">
-      <p className="font-semibold text-[var(--green-deep)]">{title}</p>
-      <p className="mt-1 text-sm leading-relaxed text-[var(--muted)]">{body}</p>
-    </div>
   );
 }

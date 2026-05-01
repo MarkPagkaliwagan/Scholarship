@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
-import { applications } from "@/db/schema";
+import { applications, documents } from "@/db/schema";
 import { and, desc, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
@@ -150,13 +150,14 @@ export async function POST(req: NextRequest) {
   }
 
   const data = parsed.data;
+  const { documentIds = [], ...appData } = body;
   const applicationId = generateApplicationId();
   const existingApplicationId = await getOwnedApplicationId(user);
   if (existingApplicationId) {
     return NextResponse.json({ error: "Application already exists" }, { status: 409 });
   }
 
-  await db.insert(applications).values({
+  const [app] = await db.insert(applications).values({
     userId: user.id,
     applicationId,
     firstName: data.firstName,
@@ -172,7 +173,16 @@ export async function POST(req: NextRequest) {
     numberOfSiblings: data.numberOfSiblings ?? null,
     guardianOccupation: data.guardianOccupation ?? null,
     guardianEmploymentStatus: data.guardianEmploymentStatus ?? null,
-  });
+  }).returning();
+
+  if (Array.isArray(documentIds) && documentIds.length > 0) {
+    for (const docId of documentIds) {
+      await db
+        .update(documents)
+        .set({ applicationId: app.id })
+        .where(eq(documents.id, docId));
+    }
+  }
 
   return NextResponse.json({ applicationId }, { status: 201 });
 }

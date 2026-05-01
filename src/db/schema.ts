@@ -1,5 +1,6 @@
-import { pgTable, serial, varchar, text, smallint, numeric, timestamp, boolean, check } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, text, smallint, numeric, timestamp, boolean, check, integer } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -43,6 +44,40 @@ export const applications = pgTable(
 
 export type Application = typeof applications.$inferSelect;
 export type NewApplication = typeof applications.$inferInsert;
+
+export const documents = pgTable(
+  "documents",
+  {
+    id: serial("id").primaryKey(),
+    applicationId: integer("application_id").references(() => applications.id, { onDelete: "cascade" }),
+    documentName: varchar("document_name", { length: 255 }).notNull(),
+    status: varchar("status", { length: 20 }).notNull().default("pending"),
+    submittedAt: timestamp("submitted_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    fileName: varchar("file_name", { length: 255 }),
+    filePath: text("file_path"),
+    fileSize: integer("file_size"),
+    mimeType: varchar("mime_type", { length: 100 }),
+    uploadedAt: timestamp("uploaded_at", { withTimezone: true }),
+  },
+  (t) => [
+    check("status_check", sql`${t.status} IN ('pending', 'submitted', 'approved', 'rejected')`),
+  ]
+);
+
+export const applicationsRelations = relations(applications, ({ many }) => ({
+  documents: many(documents),
+}));
+
+export const documentsRelations = relations(documents, ({ one }) => ({
+  application: one(applications, {
+    fields: [documents.applicationId],
+    references: [applications.id],
+  }),
+}));
+
+export type Document = typeof documents.$inferSelect;
+export type NewDocument = typeof documents.$inferInsert;
 
 export const session = pgTable("session", {
   id: text("id").primaryKey(),
