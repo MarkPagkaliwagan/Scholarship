@@ -594,7 +594,31 @@ function LoginAutoOpen({ onOpen }: { onOpen: () => void }) {
 }
 
 export default function HomePage() {
+  const router = useRouter();
   const [loginOpen, setLoginOpen] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
+
+  useEffect(() => {
+    const handleOpenLogin = () => setLoginOpen(true);
+    window.addEventListener("open-login", handleOpenLogin);
+    return () => window.removeEventListener("open-login", handleOpenLogin);
+  }, []);
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const session = await authClient.getSession();
+      if (session?.data?.user) {
+        router.replace("/dashboard");
+        return;
+      }
+      setIsChecking(false);
+    };
+    checkSession();
+  }, [router]);
+
+  if (isChecking) {
+    return null;
+  }
 
   return (
     <>
@@ -631,7 +655,7 @@ export default function HomePage() {
 
           <MovingCircleBg />
 
-          <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-4xl mx-auto pt-28 pb-20">
+          <div className="relative z-10 flex flex-col items-center text-center px-4 sm:px-6 max-w-4xl mx-auto pt-20 sm:pt-28 pb-16 sm:pb-20">
             {/* Eyebrow */}
             <p className="eyebrow mb-5">City Government of San Pablo</p>
 
@@ -659,19 +683,19 @@ export default function HomePage() {
             </div>
 
             {/* Primary headline */}
-            <h1 className="page-title text-[60px] sm:text-[80px] md:text-[100px] leading-[0.92] mb-5">
+            <h1 className="page-title text-[42px] sm:text-[60px] md:text-[80px] lg:text-[100px] leading-[0.92] mb-4 sm:mb-5">
               Iskolar ng<br />San Pablo
             </h1>
 
             {/* Sub-headline */}
             <p
-              className="font-display text-[20px] md:text-[26px] font-semibold mb-6 leading-snug"
+              className="font-display text-[18px] sm:text-[20px] md:text-[26px] font-semibold mb-4 sm:mb-6 leading-snug"
               style={{ color: "#2d6a4f" }}
             >
               Empowering San Pablo&apos;s Future
             </p>
 
-            <p className="lead text-base md:text-lg mb-12 max-w-xl">
+            <p className="lead text-sm sm:text-base md:text-lg mb-8 sm:mb-12 max-w-xl px-2 sm:px-0">
               The City Government of San Pablo supports deserving students through the City Iskolar ng San Pablo
               program — accessible, transparent, and fair.
             </p>

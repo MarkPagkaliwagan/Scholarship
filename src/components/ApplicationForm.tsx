@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { CheckCircle2, ChevronRight, ChevronLeft, FileText, AlertCircle, Loader2, User, GraduationCap, FolderOpen, ClipboardCheck, Badge, Users } from "lucide-react";
+import { CheckCircle2, ChevronRight, ChevronLeft, FileText, AlertCircle, Loader2, User, GraduationCap, FolderOpen, ClipboardCheck, Badge, Users, Upload, X, FileCheck } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { INCOME_OPTIONS, EMPLOYMENT_OPTIONS } from "@/lib/scholarship-ui";
@@ -64,6 +64,10 @@ export default function ApplicationForm({ initialEmail = "", lockEmail = false, 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [applicationId, setApplicationId] = useState("");
+  const [uploadingDoc, setUploadingDoc] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState("");
+  const [uploadedFiles, setUploadedFiles] = useState<{ [key: string]: { fileName: string; fileSize: number; id: number } }>({});
+  const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
 
   const {
     register,
@@ -87,6 +91,14 @@ export default function ApplicationForm({ initialEmail = "", lockEmail = false, 
       isValid = await trigger(["schoolName", "course", "yearLevel", "gwa"]);
     } else if (currentStep === 2) {
       isValid = await trigger(["monthlyIncome", "numberOfSiblings", "guardianOccupation", "guardianEmploymentStatus"]);
+    } else if (currentStep === 3) {
+      const requiredDocs = ["residency", "school-id", "gov-id"];
+      const allUploaded = requiredDocs.every((docId) => uploadedFiles[docId]);
+      if (!allUploaded) {
+        setUploadError("Please upload all required documents before proceeding.");
+        return;
+      }
+      isValid = true;
     } else {
       isValid = true;
     }
@@ -102,13 +114,74 @@ export default function ApplicationForm({ initialEmail = "", lockEmail = false, 
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, docId: string, docLabel: string) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadError("");
+    
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError("File size exceeds 5MB limit");
+      return;
+    }
+
+    const allowedTypes = ["application/pdf", "image/jpeg", "image/png", "image/jpg"];
+    if (!allowedTypes.includes(file.type)) {
+      setUploadError("Invalid file type. Only PDF, JPEG, and PNG are allowed");
+      return;
+    }
+
+    setUploadingDoc(docId);
+    
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("documentName", docLabel);
+
+      const res = await fetch("/api/applications/documents/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Upload failed");
+      }
+
+      const { document } = await res.json();
+      setUploadedFiles((prev) => ({
+        ...prev,
+        [docId]: { fileName: file.name, fileSize: file.size, id: document.id },
+      }));
+    } catch (err: any) {
+      setUploadError(err.message || "Failed to upload file");
+    } finally {
+      setUploadingDoc(null);
+      if (e.target) e.target.value = "";
+    }
+  };
+
+  const removeUploadedFile = (docId: string) => {
+    setUploadedFiles((prev) => {
+      const updated = { ...prev };
+      delete updated[docId];
+      return updated;
+    });
+  };
+
+  const allRequiredUploaded = () => {
+    const requiredDocs = ["residency", "school-id", "gov-id"];
+    return requiredDocs.every((docId) => uploadedFiles[docId]);
+  };
+
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     try {
+      const documentIds = Object.values(uploadedFiles).map((f) => f.id);
       const res = await fetch("/api/applications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, documentIds }),
       });
       if (!res.ok) throw new Error("Submission failed");
       const { applicationId: id } = await res.json();
@@ -588,46 +661,141 @@ export default function ApplicationForm({ initialEmail = "", lockEmail = false, 
               >
                 <div className="space-y-4">
                   {[
-                    { label: "Certificate of Residency", desc: "Issued by Barangay (last 3 months)", required: true },
-                    { label: "School ID / Enrollment Certificate", desc: "Current semester enrollment", required: true },
-                    { label: "Valid Government ID", desc: "PSA, Passport, or any gov't-issued ID", required: true },
-                    { label: "Recent 2x2 Photo", desc: "White background, professional attire", required: false },
-                  ].map((doc, idx) => (
+                    { label: "Certificate of Residency", desc: "Issued by Barangay (last 3 months)", required: true, id: "residency" },
+                    { label: "School ID / Enrollment Certificate", desc: "Current semester enrollment", required: true, id: "school-id" },
+                    { label: "Valid Government ID", desc: "PSA, Passport, or any gov't-issued ID", required: true, id: "gov-id" },
+                    { label: "Recent 2x2 Photo", desc: "White background, professional attire", required: false, id: "photo" },
+                  ].map((doc) => (
                     <div 
-                      key={idx} 
-                      className="border-2 border-dashed rounded-lg p-5 flex flex-col md:flex-row items-center justify-between gap-4 transition-all hover:border-[var(--green-bright)] cursor-pointer"
+                      key={doc.id} 
+                      className="border-2 rounded-lg p-5 transition-all"
                       style={{ borderColor: "var(--sand)", background: "var(--cream)" }}
                     >
-                      <div className="flex items-center gap-4">
-                        <div 
-                          className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
-                          style={{ background: "var(--green-deep)", color: "white" }}
-                        >
-                          <FileText className="w-5 h-5" />
+                      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                          <div 
+                            className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
+                            style={{ background: "var(--green-deep)", color: "white" }}
+                          >
+                            <FileText className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <p className="font-medium" style={{ color: "var(--green-deep)" }}>
+                              {doc.label} {doc.required && <span className="text-red-500">*</span>}
+                            </p>
+                            <p className="text-sm" style={{ color: "var(--muted)" }}>{doc.desc}</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-medium" style={{ color: "var(--green-deep)" }}>
-                            {doc.label} {doc.required && <span className="text-red-500">*</span>}
-                          </p>
-                          <p className="text-sm" style={{ color: "var(--muted)" }}>{doc.desc}</p>
+                        <div className="flex items-center gap-2">
+                          {uploadingDoc === doc.id ? (
+                            <div className="px-5 py-2.5 rounded-lg font-medium text-sm flex items-center gap-2" style={{ background: "var(--paper)", color: "var(--green-deep)" }}>
+                              <Loader2 className="w-4 h-4 animate-spin" /> Uploading...
+                            </div>
+                          ) : (
+                            <>
+                              <input
+                                type="file"
+                                ref={(el) => { fileInputRefs.current[doc.id] = el; }}
+                                className="hidden"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                onChange={(e) => handleFileUpload(e, doc.id, doc.label)}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => fileInputRefs.current[doc.id]?.click()}
+                                className="px-5 py-2.5 rounded-lg font-medium text-sm flex items-center gap-2 transition-all hover:opacity-90"
+                                style={{ background: "var(--green-deep)", color: "white" }}
+                              >
+                                <Upload className="w-4 h-4" /> Upload File
+                              </button>
+                            </>
+                          )}
                         </div>
                       </div>
-                      <div 
-                        className="px-5 py-2.5 rounded-lg font-medium text-sm flex items-center gap-2"
-                        style={{ background: "var(--paper)", color: "var(--green-deep)", border: "1px solid var(--sand-soft)" }}
-                      >
-                        Prepare file
-                      </div>
+                      {uploadedFiles[doc.id] && (
+                        <div className="mt-4 p-3 rounded-lg flex items-center gap-3" style={{ background: "var(--parchment)" }}>
+                          <FileCheck className="w-5 h-5 flex-shrink-0" style={{ color: "var(--green-bright)" }} />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate" style={{ color: "var(--green-deep)" }}>
+                              {uploadedFiles[doc.id].fileName}
+                            </p>
+                            <p className="text-xs" style={{ color: "var(--muted)" }}>
+                              {(uploadedFiles[doc.id].fileSize / 1024).toFixed(1)} KB • Uploaded
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => removeUploadedFile(doc.id)}
+                            className="p-1 rounded hover:bg-red-100 transition-colors"
+                          >
+                            <X className="w-4 h-4 text-red-500" />
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
+                {uploadError && (
+                  <div className="mt-4 p-4 rounded-lg flex items-center gap-3" style={{ background: "#fef2f2", border: "1px solid #fecaca" }}>
+                    <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-500" />
+                    <p className="text-sm text-red-600">{uploadError}</p>
+                  </div>
+                )}
+                {Object.keys(uploadedFiles).length > 0 && (
+                  <div className="mt-6 rounded-lg overflow-hidden" style={{ border: "1px solid var(--sand)" }}>
+                    <div className="p-4" style={{ background: "var(--cream)" }}>
+                      <h4 className="font-medium text-sm" style={{ color: "var(--green-deep)" }}>Uploaded Documents</h4>
+                    </div>
+                    <table className="w-full text-sm">
+                      <thead style={{ background: "var(--parchment)" }}>
+                        <tr>
+                          <th className="text-left p-3 text-xs font-medium" style={{ color: "var(--muted)" }}>Document</th>
+                          <th className="text-left p-3 text-xs font-medium" style={{ color: "var(--muted)" }}>File Name</th>
+                          <th className="text-left p-3 text-xs font-medium" style={{ color: "var(--muted)" }}>Size</th>
+                          <th className="text-left p-3 text-xs font-medium" style={{ color: "var(--muted)" }}>Status</th>
+                          <th className="text-center p-3 text-xs font-medium" style={{ color: "var(--muted)" }}>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {Object.entries(uploadedFiles).map(([docId, file]) => {
+                          const doc = [
+                            { id: "residency", label: "Certificate of Residency" },
+                            { id: "school-id", label: "School ID / Enrollment Certificate" },
+                            { id: "gov-id", label: "Valid Government ID" },
+                            { id: "photo", label: "Recent 2x2 Photo" },
+                          ].find(d => d.id === docId);
+                          return (
+                            <tr key={docId} className="border-t" style={{ borderColor: "var(--sand)" }}>
+                              <td className="p-3 font-medium" style={{ color: "var(--green-deep)" }}>{doc?.label || docId}</td>
+                              <td className="p-3 truncate max-w-[200px]" style={{ color: "var(--muted)" }}>{file.fileName}</td>
+                              <td className="p-3" style={{ color: "var(--muted)" }}>{(file.fileSize / 1024).toFixed(1)} KB</td>
+                              <td className="p-3">
+                                <span className="px-2 py-1 rounded text-xs font-medium" style={{ background: "#dcfce7", color: "#166534" }}>Uploaded</span>
+                              </td>
+                              <td className="p-3 text-center">
+                                <button
+                                  type="button"
+                                  onClick={() => removeUploadedFile(docId)}
+                                  className="text-red-500 hover:text-red-700 transition-colors"
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
                 <div 
                   className="mt-5 p-4 rounded-lg flex items-center gap-3"
                   style={{ background: "var(--parchment)" }}
                 >
                   <AlertCircle className="w-4 h-4 flex-shrink-0" style={{ color: "var(--green-bright)" }} />
                   <p className="text-sm" style={{ color: "var(--muted)" }}>
-                    Upload storage is not enabled yet. Keep files ready for scholarship office validation.
+                    Accepted formats: PDF, JPEG, PNG (Max 5MB per file). Required documents must be uploaded before submission.
                   </p>
                 </div>
               </motion.div>

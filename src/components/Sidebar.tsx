@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { X, ChevronRight, User, LogOut, Home } from "lucide-react";
+import { X, ChevronRight, User, LogOut, Home, Key } from "lucide-react";
 import { useState, useEffect } from "react";
 
 interface SidebarProps {
@@ -17,6 +17,7 @@ interface SidebarProps {
 const dashboardMenuItems = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
   { href: "/profile", label: "My Profile", icon: User },
+  { href: "/account", label: "Account Settings", icon: Key },
 ];
 
 function getInitials(name?: string) {
@@ -69,8 +70,98 @@ export default function Sidebar({ menuOpen, setMenuOpen, navLinks, pathname, use
     );
   }
 
-  // Desktop/Tablet Drawer (hidden on mobile, hidden for dashboard on desktop)
-  if (isMobile || isDashboard) return null;
+  // Mobile Menu for public pages (≤640px)
+  if (isMobile && !isDashboard) {
+    if (!menuOpen) return null;
+    return (
+      <>
+        <div
+          className="fixed inset-0 z-40 backdrop-blur-sm"
+          style={{ background: "rgba(0,0,0,0.5)" }}
+          onClick={() => setMenuOpen(false)}
+        />
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center"
+          style={{ pointerEvents: menuOpen ? "auto" : "none" }}
+        >
+          <div
+            className={`w-full max-w-lg mx-auto rounded-t-3xl shadow-2xl transform transition-all duration-300 [transition-timing-function:cubic-bezier(0.32,0.72,0,1)] ${
+              menuOpen ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
+            }`}
+            style={{
+              background: "var(--paper)",
+              borderTop: "1px solid var(--sand-soft)",
+              padding: "24px 24px 40px",
+            }}
+          >
+            <div className="mx-auto w-10 h-1 rounded-full mb-6" style={{ background: "var(--sand-soft)" }} />
+
+            {user && (
+              <div className="flex items-center gap-3 mb-6 pb-4" style={{ borderBottom: "1px solid var(--sand-soft)" }}>
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm" style={{ background: "var(--green-deep)" }}>
+                  {getInitials(user.name)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate" style={{ color: "var(--green-deep)" }}>{user.name}</p>
+                  <p className="text-xs truncate" style={{ color: "var(--muted)" }}>{user.email}</p>
+                </div>
+              </div>
+            )}
+
+            <nav className="space-y-1">
+              {menuItems.map((item) => {
+                const isActive = pathname === item.href;
+                const Icon = item.icon as React.ComponentType<{ className?: string }>;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200"
+                    style={{
+                      background: isActive ? "rgba(45,106,79,0.07)" : "transparent",
+                      color: isActive ? "var(--green-deep)" : "var(--muted)",
+                    }}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {Icon && <Icon className="w-5 h-5" />}
+                    <span className="text-sm font-medium">{item.label}</span>
+                    {isActive && <ChevronRight className="w-4 h-4 ml-auto" style={{ color: "var(--green-bright)" }} />}
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {user ? (
+              <button
+                onClick={() => {
+                  handleSignOut();
+                  setMenuOpen(false);
+                }}
+                className="flex items-center gap-3 px-4 py-3 w-full rounded-xl mt-4 transition-all duration-200"
+                style={{ color: "#dc2626" }}
+              >
+                <LogOut className="w-5 h-5" />
+                <span className="text-sm font-medium">Sign Out</span>
+              </button>
+            ) : (
+              <Link
+                href="/apply"
+                className="flex items-center justify-center gap-2 px-4 py-3 w-full rounded-xl mt-4 font-medium text-sm"
+                style={{ background: "var(--green-deep)", color: "var(--cream)" }}
+                onClick={() => setMenuOpen(false)}
+              >
+                <LogIn className="w-4 h-4" />
+                Sign In / Apply
+              </Link>
+            )}
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // Desktop/Tablet Drawer (hidden for dashboard on desktop)
+  if (isDashboard) return null;
 
   // Don't render drawer if menu is closed (for non-dashboard)
   if (!menuOpen) return null;
