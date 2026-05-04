@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { X, ChevronRight, User, LogOut, Home, Key } from "lucide-react";
+import { X, ChevronRight, User, LogOut, LogIn, Home, Key } from "lucide-react";
 import { useState, useEffect } from "react";
 
 interface SidebarProps {
