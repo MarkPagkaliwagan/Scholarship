@@ -104,7 +104,7 @@ function LoginPanel({ open, onClose }: LoginPanelProps) {
       return;
     }
     onClose();
-    router.replace("/dashboard");
+    router.replace("/verify");
   };
 
   const inputBase =
