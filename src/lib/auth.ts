@@ -40,6 +40,11 @@ function getTrustedOrigins() {
 export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: "pg", schema }),
   emailAndPassword: { enabled: true },
+  user: {
+    deleteUser: {
+      enabled: true,
+    },
+  },
   baseURL: resolveServerAuthBaseURL(),
   trustedOrigins: getTrustedOrigins(),
 });

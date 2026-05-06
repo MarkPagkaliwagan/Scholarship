@@ -11,6 +11,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import ScholarShell from "@/components/ScholarShell";
+import DeleteConfirmModal from "@/components/DeleteConfirmModal";
 import { authClient } from "@/lib/auth-client";
 
 export default function AccountPage() {
@@ -23,6 +24,7 @@ export default function AccountPage() {
   const [passwordSuccess, setPasswordSuccess] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
   const [deletingAccount, setDeletingAccount] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -81,16 +83,13 @@ export default function AccountPage() {
     }
   };
 
-  const handleDeleteAccount = async () => {
-    if (!confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
-      return;
-    }
+  const handleDeleteAccount = () => {
+    setShowDeleteModal(true);
+  };
 
-    if (!confirm("All your data including applications and documents will be permanently deleted. Continue?")) {
-      return;
-    }
-
+  const confirmDeleteAccount = async () => {
     setDeletingAccount(true);
+    setShowDeleteModal(false);
 
     try {
       const res = await authClient.deleteUser();
@@ -293,6 +292,12 @@ export default function AccountPage() {
           </div>
         </motion.section>
       </div>
+      <DeleteConfirmModal
+        open={showDeleteModal}
+        onOpenChange={setShowDeleteModal}
+        onConfirm={confirmDeleteAccount}
+        loading={deletingAccount}
+      />
     </ScholarShell>
   );
 }
