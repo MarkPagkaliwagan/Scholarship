@@ -1,4 +1,4 @@
-// Scholarship DB - Tunnel Connect
+// iGAT DB - Tunnel Connect
 // Usage: bun scripts/connect.ts
 // First run downloads cloudflared automatically. No admin needed.
 
@@ -6,9 +6,9 @@ import { existsSync } from "fs";
 import { join } from "path";
 import { $ } from "bun";
 
-const TUNNEL_HOSTNAME = "scholarship-db.igat.com.ph";
+const TUNNEL_HOSTNAME = "trial-db.igat.com.ph";
 const LOCAL_PORT      = "5433";
-const DB_URL          = `postgresql://scholarship_admin:<password>@localhost:${LOCAL_PORT}/scholarship_db`;
+const DB_URL          = `postgresql://lgu_admin:eU5YDygexu6cmMz8pznzen8QIHzDA7d4@localhost:${LOCAL_PORT}/lgu_system`;
 
 const ARCH = process.arch === "arm64" ? "arm64" : "amd64";
 const PLATFORM_URLS: Record<string, string> = {
@@ -36,8 +36,8 @@ if (EXE_PATH === LOCAL_EXE && !existsSync(LOCAL_EXE)) {
   console.log("Done.\n");
 }
 
-console.log(`\n  Scholarship DB - Tunnel Connect`);
-console.log(`  ================================`);
+console.log(`\n  iGAT DB - Tunnel Connect`);
+console.log(`  =========================`);
 console.log(`\n  Tunnel: localhost:${LOCAL_PORT} -> ${TUNNEL_HOSTNAME}`);
 console.log(`\n  DATABASE_URL:`);
 console.log(`  ${DB_URL}`);
