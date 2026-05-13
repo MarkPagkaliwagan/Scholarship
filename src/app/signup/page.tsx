@@ -9,7 +9,8 @@ import MovingCircleBg from "@/components/MovingCircleBg";
 
 export default function SignupPage() {
   const router = useRouter();
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,7 +21,15 @@ export default function SignupPage() {
     setLoading(true);
     setError(null);
 
-    const { error: signupError } = await authClient.signUp.email({ email, password, name });
+    const name = `${firstName.trim()} ${lastName.trim()}`.trim();
+    const { error: signupError } = await authClient.signUp.email({
+      email,
+      password,
+      name,
+      // @ts-expect-error better-auth additional fields
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+    });
     if (signupError) {
       setError(signupError.message ?? "Unable to create account.");
       setLoading(false);
@@ -128,20 +137,36 @@ export default function SignupPage() {
             </div>
 
             <div className="space-y-4 p-6 md:p-8">
-              <label className="block">
-                <span className="value-label mb-2 block">Full Name</span>
-                <div className="relative">
-                  <User className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]" />
-                  <input
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                    minLength={2}
-                    className="field-control px-11 py-3 text-sm"
-                    placeholder="Juan dela Cruz"
-                  />
-                </div>
-              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <label className="block">
+                  <span className="value-label mb-2 block">First Name</span>
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]" />
+                    <input
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      required
+                      minLength={2}
+                      className="field-control px-11 py-3 text-sm"
+                      placeholder="Juan"
+                    />
+                  </div>
+                </label>
+                <label className="block">
+                  <span className="value-label mb-2 block">Last Name</span>
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]" />
+                    <input
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      required
+                      minLength={2}
+                      className="field-control px-11 py-3 text-sm"
+                      placeholder="dela Cruz"
+                    />
+                  </div>
+                </label>
+              </div>
 
               <label className="block">
                 <span className="value-label mb-2 block">Email Address</span>
