@@ -71,7 +71,6 @@ export default function ApplyPage() {
     });
 
     const session = await authClient.getSession();
-    const signupName = `${signupFirstName.trim()} ${signupLastName.trim()}`.trim();
     setUser(session?.data?.user ?? { name: signupName, email: signupEmail });
     setSignupLoading(false);
   };
