@@ -26,7 +26,6 @@ export default function SignupPage() {
       email,
       password,
       name,
-      // @ts-expect-error better-auth additional fields
       firstName: firstName.trim(),
       lastName: lastName.trim(),
     });
