@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 5001",
+    "dev": "bun scripts/dev.ts",
+    "dev:web": "next dev -p 5001",
+    "dev:db": "bun scripts/connect.ts",
+    "dev:setup-db": "bun scripts/setup-db-host.ts",
     "build": "next build",
     "start": "next start -p 5001",
     "lint": "eslint",

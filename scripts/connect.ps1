@@ -2,7 +2,7 @@
 # No admin needed. Double-click or run:
 #   powershell -ExecutionPolicy Bypass -File scripts\connect.ps1
 
-$TUNNEL_HOSTNAME = "scholarship-db.igat.com.ph"
+$TUNNEL_HOSTNAME = if ($env:TUNNEL_HOSTNAME) { $env:TUNNEL_HOSTNAME } else { "trial-db.igat.com.ph" }
 $LOCAL_PORT      = "5433"
 $CLOUDFLARED_EXE = "C:\Program Files (x86)\cloudflared\cloudflared.exe"
 $DOWNLOAD_URL    = "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-amd64.exe"
