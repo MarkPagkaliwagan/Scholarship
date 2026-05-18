@@ -123,7 +123,7 @@ export function getStatusMeta(status?: string): StatusMeta {
 
 export function getProfileCompleteness(application: ScholarApplication | null) {
   if (!application) {
-    return { completed: 0, total: fields.length, percent: 0 };
+    return { completed: 0, total: 13, percent: 0 };
   }
 
   const fields = [
