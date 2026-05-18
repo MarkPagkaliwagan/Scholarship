@@ -36,6 +36,20 @@
       "when": 1777554377585,
       "tag": "0004_outgoing_chameleon",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1779079499251,
+      "tag": "0005_ordinary_unicorn",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1747582920000,
+      "tag": "0006_scholar_category",
+      "breakpoints": true
     }
   ]
 }

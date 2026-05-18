@@ -7,7 +7,8 @@ import { join } from "path";
 import { existsSync } from "fs";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const ALLOWED_TYPES = ["application/pdf", "image/jpeg", "image/png", "image/jpg"];
+const DOCUMENT_ALLOWED_TYPES = ["application/pdf", "image/jpeg", "image/png", "image/jpg"];
+const PHOTO_ALLOWED_TYPES = ["image/jpeg", "image/png", "image/jpg"];
 
 export async function POST(req: NextRequest) {
   try {
@@ -24,9 +25,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "File and documentName are required" }, { status: 400 });
     }
 
-    if (!ALLOWED_TYPES.includes(file.type)) {
+    const isPhoto = documentName.toLowerCase().includes("2x2") || documentName.toLowerCase().includes("photo");
+    const allowedTypes = isPhoto ? PHOTO_ALLOWED_TYPES : DOCUMENT_ALLOWED_TYPES;
+    if (!allowedTypes.includes(file.type)) {
       return NextResponse.json(
-        { error: "Invalid file type. Only PDF, JPEG, and PNG are allowed" },
+        { error: isPhoto ? "Invalid file type. Only JPEG and PNG images are allowed for 2x2 photo." : "Invalid file type. Only PDF, JPEG, and PNG are allowed" },
         { status: 400 }
       );
     }

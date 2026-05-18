@@ -4,10 +4,14 @@ import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { CheckCircle2, ChevronRight, ChevronLeft, FileText, AlertCircle, Loader2, User, GraduationCap, FolderOpen, ClipboardCheck, Badge, Users, Upload, X, FileCheck } from "lucide-react";
+import { CheckCircle2, ChevronRight, ChevronLeft, FileText, AlertCircle, Loader2, User, GraduationCap, FolderOpen, ClipboardCheck, Badge, Users, Upload, X, FileCheck, Award } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { INCOME_OPTIONS, EMPLOYMENT_OPTIONS } from "@/lib/scholarship-ui";
+import { INCOME_OPTIONS, EMPLOYMENT_OPTIONS, SCHOLAR_CATEGORIES, CATEGORY_LABELS } from "@/lib/scholarship-ui";
+
+const categorySchema = z.object({
+  scholarCategory: z.string().min(1, "Please select a scholar category"),
+});
 
 const personalSchema = z.object({
   firstName: z.string().min(2, "First name is required"),
@@ -32,6 +36,7 @@ const familySchema = z.object({
 });
 
 const formSchema = z.object({
+  ...categorySchema.shape,
   ...personalSchema.shape,
   ...educationSchema.shape,
   ...familySchema.shape,
@@ -46,6 +51,7 @@ interface FormStep {
 }
 
 const steps: FormStep[] = [
+  { id: "category",  title: "Category",  icon: Award },
   { id: "personal",  title: "Personal",  icon: User },
   { id: "education", title: "Education", icon: GraduationCap },
   { id: "family",    title: "Family",    icon: Users },
@@ -74,6 +80,8 @@ export default function ApplicationForm({ initialEmail = "", lockEmail = false, 
     handleSubmit,
     trigger,
     getValues,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -86,12 +94,14 @@ export default function ApplicationForm({ initialEmail = "", lockEmail = false, 
   const nextStep = async () => {
     let isValid = false;
     if (currentStep === 0) {
-      isValid = await trigger(["firstName", "lastName", "email", "phone", "address"]);
+      isValid = await trigger(["scholarCategory"]);
     } else if (currentStep === 1) {
-      isValid = await trigger(["schoolName", "course", "yearLevel", "gwa"]);
+      isValid = await trigger(["firstName", "lastName", "email", "phone", "address"]);
     } else if (currentStep === 2) {
-      isValid = await trigger(["monthlyIncome", "numberOfSiblings", "guardianOccupation", "guardianEmploymentStatus"]);
+      isValid = await trigger(["schoolName", "course", "yearLevel", "gwa"]);
     } else if (currentStep === 3) {
+      isValid = await trigger(["monthlyIncome", "numberOfSiblings", "guardianOccupation", "guardianEmploymentStatus"]);
+    } else if (currentStep === 4) {
       const requiredDocs = ["residency", "school-id", "gov-id"];
       const allUploaded = requiredDocs.every((docId) => uploadedFiles[docId]);
       if (!allUploaded) {
@@ -125,9 +135,12 @@ export default function ApplicationForm({ initialEmail = "", lockEmail = false, 
       return;
     }
 
-    const allowedTypes = ["application/pdf", "image/jpeg", "image/png", "image/jpg"];
+    const isPhoto = docId === "photo";
+    const allowedTypes = isPhoto
+      ? ["image/jpeg", "image/png", "image/jpg"]
+      : ["application/pdf", "image/jpeg", "image/png", "image/jpg"];
     if (!allowedTypes.includes(file.type)) {
-      setUploadError("Invalid file type. Only PDF, JPEG, and PNG are allowed");
+      setUploadError(isPhoto ? "Invalid file type. Only JPEG and PNG images are allowed for 2x2 photo." : "Invalid file type. Only PDF, JPEG, and PNG are allowed");
       return;
     }
 
@@ -312,6 +325,72 @@ export default function ApplicationForm({ initialEmail = "", lockEmail = false, 
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
               >
+                <div className="text-center mb-8">
+                  <div className="w-16 h-16 rounded-xl mx-auto mb-4 flex items-center justify-center" style={{ background: "var(--green-deep)", color: "white" }}>
+                    <Award className="w-8 h-8" />
+                  </div>
+                  <h2 className="text-2xl font-bold mb-2" style={{ color: "var(--green-deep)" }}>
+                    Category of Scholar
+                  </h2>
+                  <p className="text-sm" style={{ color: "var(--muted)" }}>
+                    Select the category that best describes your scholarship eligibility.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {SCHOLAR_CATEGORIES.map((cat) => {
+                    const selected = watch("scholarCategory") === cat.value;
+                    return (
+                      <div
+                        key={cat.value}
+                        onClick={() => {
+                          setValue("scholarCategory", cat.value, { shouldValidate: true });
+                        }}
+                        className={`relative p-5 rounded-xl border-2 cursor-pointer transition-all ${
+                          selected
+                            ? "border-[var(--green-deep)] bg-[var(--cream)]"
+                            : "border-gray-100 bg-gray-50/30 hover:border-[var(--green-bright)] hover:bg-white"
+                        }`}
+                      >
+                        <div className="flex items-start gap-4">
+                          <div
+                            className={`w-5 h-5 rounded-full border-2 mt-0.5 flex items-center justify-center flex-shrink-0 transition-all ${
+                              selected ? "border-[var(--green-deep)]" : "border-gray-300"
+                            }`}
+                          >
+                            {selected && (
+                              <div className="w-3 h-3 rounded-full" style={{ background: "var(--green-deep)" }} />
+                            )}
+                          </div>
+                          <div>
+                            <p className={`font-semibold text-sm ${selected ? "text-[var(--green-deep)]" : "text-gray-700"}`}>
+                              {cat.label}
+                            </p>
+                            <p className="text-xs mt-1 leading-relaxed" style={{ color: "var(--muted)" }}>
+                              {cat.description}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                {errors.scholarCategory && (
+                  <p className="text-red-500 text-xs flex items-center gap-1 mt-4 justify-center">
+                    <AlertCircle className="w-3 h-3" /> {errors.scholarCategory.message}
+                  </p>
+                )}
+              </motion.div>
+            )}
+
+            {currentStep === 1 && (
+              <motion.div
+                key="step-1"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label htmlFor="firstName" className="block text-sm font-medium" style={{ color: "var(--green-deep)" }}>
@@ -432,9 +511,9 @@ export default function ApplicationForm({ initialEmail = "", lockEmail = false, 
               </motion.div>
             )}
 
-            {currentStep === 1 && (
+            {currentStep === 2 && (
               <motion.div
-                key="step-1"
+                key="step-2"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -535,9 +614,9 @@ export default function ApplicationForm({ initialEmail = "", lockEmail = false, 
               </motion.div>
             )}
 
-            {currentStep === 2 && (
+            {currentStep === 3 && (
               <motion.div
-                key="step-2"
+                key="step-3"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -651,9 +730,9 @@ export default function ApplicationForm({ initialEmail = "", lockEmail = false, 
               </motion.div>
             )}
 
-            {currentStep === 3 && (
+            {currentStep === 4 && (
               <motion.div
-                key="step-3"
+                key="step-4"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -697,7 +776,7 @@ export default function ApplicationForm({ initialEmail = "", lockEmail = false, 
                                 type="file"
                                 ref={(el) => { fileInputRefs.current[doc.id] = el; }}
                                 className="hidden"
-                                accept=".pdf,.jpg,.jpeg,.png"
+                                accept={doc.id === "photo" ? ".jpg,.jpeg,.png" : ".pdf,.jpg,.jpeg,.png"}
                                 onChange={(e) => handleFileUpload(e, doc.id, doc.label)}
                               />
                               <button
@@ -801,9 +880,9 @@ export default function ApplicationForm({ initialEmail = "", lockEmail = false, 
               </motion.div>
             )}
 
-            {currentStep === 4 && (
+            {currentStep === 5 && (
               <motion.div
-                key="step-4"
+                key="step-5"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -813,6 +892,20 @@ export default function ApplicationForm({ initialEmail = "", lockEmail = false, 
                   className="rounded-lg p-6 md:p-8 space-y-6"
                   style={{ background: "var(--cream)", border: "1px solid var(--sand)" }}
                 >
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <Award className="w-4 h-4" style={{ color: "var(--green-bright)" }} />
+                      <h3 className="text-[10px] uppercase tracking-widest font-semibold" style={{ color: "var(--green-mid)" }}>
+                        Scholar Category
+                      </h3>
+                    </div>
+                    <div className="p-4 rounded-lg bg-white border text-sm" style={{ borderColor: "var(--sand)" }}>
+                      <p className="font-medium" style={{ color: "var(--green-deep)" }}>
+                        {CATEGORY_LABELS[getValues("scholarCategory") as keyof typeof CATEGORY_LABELS] || getValues("scholarCategory") || "—"}
+                      </p>
+                    </div>
+                  </div>
+
                   <div>
                     <div className="flex items-center gap-2 mb-4">
                       <User className="w-4 h-4" style={{ color: "var(--green-bright)" }} />

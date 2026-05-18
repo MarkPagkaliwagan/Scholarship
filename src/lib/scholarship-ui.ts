@@ -7,9 +7,19 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+export const SCHOLAR_CATEGORIES = [
+  { value: "varsity", label: "Varsity", description: "Student-athlete representing the school in sports competitions" },
+  { value: "indigency", label: "Indigency", description: "Family belongs to low-income household as per social welfare assessment" },
+  { value: "music_and_arts", label: "Music and Arts", description: "Demonstrated talent in music, visual arts, or performing arts" },
+  { value: "academic", label: "Academic", description: "Consistently high academic performance and scholastic excellence" },
+] as const;
+
+export const CATEGORY_LABELS = Object.fromEntries(SCHOLAR_CATEGORIES.map((c) => [c.value, c.label]));
+
 export type ScholarApplication = {
   id: number;
   applicationId: string;
+  scholarCategory: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -113,10 +123,11 @@ export function getStatusMeta(status?: string): StatusMeta {
 
 export function getProfileCompleteness(application: ScholarApplication | null) {
   if (!application) {
-    return { completed: 0, total: 8, percent: 0 };
+    return { completed: 0, total: fields.length, percent: 0 };
   }
 
   const fields = [
+    application.scholarCategory,
     application.firstName,
     application.lastName,
     application.email,

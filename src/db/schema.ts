@@ -10,6 +10,8 @@ export const user = pgTable("user", {
   image: text("image"),
   createdAt: timestamp("created_at").notNull(),
   updatedAt: timestamp("updated_at").notNull(),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
 });
 
 export const applications = pgTable(
@@ -27,6 +29,7 @@ export const applications = pgTable(
     course: varchar("course", { length: 255 }).notNull(),
     yearLevel: smallint("year_level").notNull(),
     gwa: numeric("gwa", { precision: 5, scale: 2 }).notNull(),
+    scholarCategory: varchar("scholar_category", { length: 30 }).notNull(),
     monthlyIncome: varchar("monthly_income", { length: 30 }),
     numberOfSiblings: smallint("number_of_siblings"),
     guardianOccupation: varchar("guardian_occupation", { length: 255 }),
@@ -46,7 +49,7 @@ export type Application = typeof applications.$inferSelect;
 export type NewApplication = typeof applications.$inferInsert;
 
 export const documents = pgTable(
-  "documents",
+  "scholarship_documents",
   {
     id: serial("id").primaryKey(),
     applicationId: integer("application_id").references(() => applications.id, { onDelete: "cascade" }),

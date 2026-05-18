@@ -8,7 +8,10 @@ import { auth } from "@/lib/auth";
 const INCOME_VALUES = ["below_5000", "5000_10000", "10000_20000", "20000_30000", "above_30000"] as const;
 const EMPLOYMENT_VALUES = ["employed", "self_employed", "unemployed", "ofw", "deceased"] as const;
 
+const CATEGORY_VALUES = ["varsity", "indigency", "music_and_arts", "academic"] as const;
+
 const bodySchema = z.object({
+  scholarCategory: z.enum(CATEGORY_VALUES),
   firstName: z.string().min(2),
   lastName: z.string().min(2),
   email: z.string().email().optional(),
@@ -90,6 +93,7 @@ export async function PUT(req: NextRequest) {
   }
 
   await db.update(applications).set({
+    scholarCategory: data.scholarCategory,
     firstName: data.firstName,
     lastName: data.lastName,
     email: user.email,
@@ -160,6 +164,7 @@ export async function POST(req: NextRequest) {
   const [app] = await db.insert(applications).values({
     userId: user.id,
     applicationId,
+    scholarCategory: data.scholarCategory,
     firstName: data.firstName,
     lastName: data.lastName,
     email: user.email,

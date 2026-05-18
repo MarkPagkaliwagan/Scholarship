@@ -27,6 +27,7 @@ import ScholarShell from "@/components/ScholarShell";
 import { authClient } from "@/lib/auth-client";
 import {
   DOCUMENT_REQUIREMENTS,
+  CATEGORY_LABELS,
   type ScholarApplication,
   formatDate,
   formatYearLevel,
@@ -284,6 +285,12 @@ export default function ProfilePage() {
                   {application.firstName} {application.lastName}
                 </h2>
                 <p className="mt-3 font-mono text-sm text-white/70">{application.applicationId}</p>
+                {application.scholarCategory && (
+                  <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/12 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white/90">
+                    <Award className="w-3.5 h-3.5" />
+                    {CATEGORY_LABELS[application.scholarCategory as keyof typeof CATEGORY_LABELS] || application.scholarCategory}
+                  </p>
+                )}
               </div>
               <div className="space-y-4 p-5">
                 <div className="flex items-center justify-between gap-4">
@@ -317,6 +324,7 @@ export default function ProfilePage() {
               <p className="value-label mb-4">Application Snapshot</p>
               <div className="space-y-4">
                 <SnapshotRow icon={CalendarDays} label="Submitted" value={formatDate(application.submittedAt)} />
+                <SnapshotRow icon={Award} label="Category" value={CATEGORY_LABELS[application.scholarCategory as keyof typeof CATEGORY_LABELS] || application.scholarCategory || "—"} />
                 <SnapshotRow icon={GraduationCap} label="Year Level" value={formatYearLevel(application.yearLevel)} />
                 <SnapshotRow icon={Award} label="Latest GWA" value={application.gwa} />
               </div>
