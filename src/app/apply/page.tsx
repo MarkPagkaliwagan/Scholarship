@@ -14,7 +14,8 @@ export default function ApplyPage() {
   const [user, setUser] = useState<null | { name?: string; email?: string }>(null);
   const [existingApplication, setExistingApplication] = useState<ScholarApplication | null>(null);
   const [checkingSession, setCheckingSession] = useState(true);
-  const [signupName, setSignupName] = useState("");
+  const [signupFirstName, setSignupFirstName] = useState("");
+  const [signupLastName, setSignupLastName] = useState("");
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [signupLoading, setSignupLoading] = useState(false);
@@ -49,10 +50,13 @@ export default function ApplyPage() {
     setSignupLoading(true);
     setSignupError(null);
 
+    const signupName = `${signupFirstName.trim()} ${signupLastName.trim()}`.trim();
     const { error } = await authClient.signUp.email({
       email: signupEmail,
       password: signupPassword,
       name: signupName,
+      firstName: signupFirstName.trim(),
+      lastName: signupLastName.trim(),
     });
 
     if (error) {
@@ -232,20 +236,36 @@ export default function ApplyPage() {
             </div>
 
             <div className="space-y-4 p-6 md:p-8">
-              <label className="block">
-                <span className="value-label mb-2 block">Full Name</span>
-                <div className="relative">
-                  <User className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]" />
-                  <input
-                    value={signupName}
-                    onChange={(event) => setSignupName(event.target.value)}
-                    required
-                    minLength={2}
-                    className="field-control px-11 py-3 text-sm"
-                    placeholder="Juan dela Cruz"
-                  />
-                </div>
-              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <label className="block">
+                  <span className="value-label mb-2 block">First Name</span>
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]" />
+                    <input
+                      value={signupFirstName}
+                      onChange={(event) => setSignupFirstName(event.target.value)}
+                      required
+                      minLength={2}
+                      className="field-control px-11 py-3 text-sm"
+                      placeholder="Juan"
+                    />
+                  </div>
+                </label>
+                <label className="block">
+                  <span className="value-label mb-2 block">Last Name</span>
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]" />
+                    <input
+                      value={signupLastName}
+                      onChange={(event) => setSignupLastName(event.target.value)}
+                      required
+                      minLength={2}
+                      className="field-control px-11 py-3 text-sm"
+                      placeholder="dela Cruz"
+                    />
+                  </div>
+                </label>
+              </div>
 
               <label className="block">
                 <span className="value-label mb-2 block">Email Address</span>

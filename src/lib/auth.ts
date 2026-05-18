@@ -31,6 +31,7 @@ function getTrustedOrigins() {
     "http://localhost:3000",
     "http://localhost:5001",
     "https://scholarship.igat.com.ph",
+    "https://scholarship-spc.igat.com.ph",
     process.env.BETTER_AUTH_URL,
     process.env.NEXT_PUBLIC_BETTER_AUTH_URL,
     process.env.NEXT_PUBLIC_API_URL,
@@ -41,6 +42,18 @@ export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: "pg", schema }),
   emailAndPassword: { enabled: true },
   user: {
+    additionalFields: {
+      firstName: {
+        type: "string",
+        required: true,
+        fieldName: "first_name",
+      },
+      lastName: {
+        type: "string",
+        required: true,
+        fieldName: "last_name",
+      },
+    },
     deleteUser: {
       enabled: true,
     },
