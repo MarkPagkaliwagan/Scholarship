@@ -1,4 +1,5 @@
 import { readFileSync } from "fs";
+import { writeFileSync } from "fs";
 import { $ } from "bun";
 
 const hostname = process.env.TUNNEL_HOSTNAME ?? "trial-db.igat.com.ph";
@@ -56,16 +57,30 @@ if (process.platform === "darwin") {
   await $`osascript -e ${`do shell script "${command.replaceAll("\"", "\\\"")}" with administrator privileges`}`;
 } else if (process.platform === "win32") {
   const escapedLine = line.replaceAll("'", "''");
+  const tempDir = process.env.TEMP ?? process.env.TMP ?? "C:\\Windows\\Temp";
+  const tempScript = `${tempDir}\\igat-setup-db-host.ps1`;
+  const tempLog = `${tempDir}\\igat-setup-db-host.log`;
   const script = [
+    `$ErrorActionPreference = 'Stop'`,
+    `Start-Transcript -Path '${tempLog}' -Force | Out-Null`,
     `$hosts = "$env:SystemRoot\\System32\\drivers\\etc\\hosts"`,
     `if (-not (Select-String -Path $hosts -Pattern '${hostname}' -Quiet)) {`,
     `  Add-Content -Path $hosts -Value "\`r\`n${escapedLine}"`,
     `}`,
+    `Write-Host '${hostname} pinned to ${address}.'`,
+    `Stop-Transcript | Out-Null`,
   ].join("; ");
-  const command = `Start-Process powershell -Verb RunAs -Wait -ArgumentList '-NoProfile','-ExecutionPolicy','Bypass','-Command','${script.replaceAll("'", "''")}'`;
+  writeFileSync(tempScript, script, "utf8");
+  const command = `Start-Process powershell -Verb RunAs -Wait -ArgumentList '-NoProfile','-ExecutionPolicy','Bypass','-File','${tempScript}'`;
 
   console.log(`Adding ${line} to ${hostsPath}. Windows may ask for administrator approval.`);
   await $`powershell.exe -NoProfile -ExecutionPolicy Bypass -Command ${command}`;
+  try {
+    const log = readFileSync(tempLog, "utf8").trim();
+    if (log) console.log(log);
+  } catch {
+    console.log(`${hostname} pinned to ${address}.`);
+  }
 } else {
   console.log(`Skipping hosts setup on ${process.platform}. Add this line manually if IPv6 breaks cloudflared:`);
   console.log(line);
